@@ -1,0 +1,12 @@
+[submodule "bamboos"]
+	path = bamboos
+	url = ../bamboos
+[submodule "oneclient"]
+	path = oneclient
+	url = ../oneclient
+[submodule "fs-onedatafs"]
+	path = fs-onedatafs
+	url = ../fs-onedatafs
+[submodule "onedatafs-jupyter"]
+	path = onedatafs-jupyter
+	url = ../onedatafs-jupyter/
