@@ -5,13 +5,11 @@ DOCKER_RELEASE          ?= development
 DOCKER_REG_NAME         ?= "docker.onedata.org"
 DOCKER_REG_USER         ?= ""
 DOCKER_REG_PASSWORD     ?= ""
-PROD_RELEASE_BASE_IMAGE ?= "onedata/oneprovider-common:2102-3"
-DEV_RELEASE_BASE_IMAGE  ?= "onedata/oneprovider-dev-common:2102-6"
+PROD_RELEASE_BASE_IMAGE ?= "onedata/oneprovider-common:2002-2"
+DEV_RELEASE_BASE_IMAGE  ?= "onedata/oneprovider-dev-common:2002-2"
 HTTP_PROXY              ?= "http://proxy.devel.onedata.org:3128"
 CONDA_TOKEN             ?= ""
 CONDA_BUILD_OPTIONS     ?= ""
-RETRIES                 ?= 0
-RETRY_SLEEP             ?= 300
 
 ifeq ($(strip $(ONEPROVIDER_VERSION)),)
 ONEPROVIDER_VERSION     := $(shell git describe --tags --always --abbrev=7)
@@ -52,7 +50,6 @@ FSONEDATAFS_VERSION           := $(shell echo ${FSONEDATAFS_VERSION} | tr - .)
 ONEDATAFS_JUPYTER_VERSION     := $(shell echo ${ONEDATAFS_JUPYTER_VERSION} | tr - .)
 
 ONEPROVIDER_BUILD       ?= 1
-PKG_BUILDER_VERSION     ?= -3
 ONECLIENT_FPMPACKAGE_TMP ?= package_fpm
 
 ifdef IGNORE_XFAIL
@@ -83,13 +80,12 @@ NO_CACHE :=  $(shell if [ "${NO_CACHE}" != "" ]; then echo "--no-cache"; fi)
 
 make = $(1)/make.py -s $(1) -r . $(NO_CACHE)
 clean = $(call make, $(1)) clean
-retry = RETRIES=$(RETRIES); until $(1) && return 0 || [ $$RETRIES -eq 0 ]; do sleep $(RETRY_SLEEP); RETRIES=`expr $$RETRIES - 1`; echo "===== Cleaning up... ====="; make clean_all; echo "\n\n\n===== Retrying build... ====="; done; return 1 
-make_rpm = $(call make, $(1)) -e DISTRIBUTION=$(DISTRIBUTION) -e RELEASE=$(RELEASE) --privileged --group mock -i onedata/rpm_builder:$(DISTRIBUTION)-$(RELEASE)$(PKG_BUILDER_VERSION) $(2)  
+make_rpm = $(call make, $(1)) -e DISTRIBUTION=$(DISTRIBUTION) -e RELEASE=$(RELEASE) --privileged --group mock -i onedata/rpm_builder:$(DISTRIBUTION)-$(RELEASE) $(2)
 mv_rpm = mv $(1)/package/packages/*.src.rpm package/$(DISTRIBUTION)/SRPMS && \
 	mv $(1)/package/packages/*.x86_64.rpm package/$(DISTRIBUTION)/x86_64
 mv_noarch_rpm = mv $(1)/package/packages/*.src.rpm package/$(DISTRIBUTION)/SRPMS && \
 	mv $(1)/package/packages/*.noarch.rpm package/$(DISTRIBUTION)/x86_64
-make_deb = $(call make, $(1)) -e DISTRIBUTION=$(DISTRIBUTION) --privileged --group sbuild -i onedata/deb_builder:$(DISTRIBUTION)-$(RELEASE)$(PKG_BUILDER_VERSION) $(2)
+make_deb = $(call make, $(1)) -e DISTRIBUTION=$(DISTRIBUTION) --privileged --group sbuild -i onedata/deb_builder:$(DISTRIBUTION)-$(RELEASE) $(2)
 mv_deb = mv $(1)/package/packages/*_amd64.deb package/$(DISTRIBUTION)/binary-amd64 && \
 	mv $(1)/package/packages/*.tar.gz package/$(DISTRIBUTION)/source | true && \
 	mv $(1)/package/packages/*.dsc package/$(DISTRIBUTION)/source | true && \
@@ -103,7 +99,7 @@ mv_noarch_deb = mv $(1)/package/packages/*_all.deb package/$(DISTRIBUTION)/binar
 	mv $(1)/package/packages/*.debian.tar.xz package/$(DISTRIBUTION)/source | true && \
 	mv $(1)/package/packages/*.changes package/$(DISTRIBUTION)/source | true
 unpack = tar xzf $(1).tar.gz
-make_conda = $(call make, $(1)) -e CONDA_TOKEN=$(CONDA_TOKEN) -i onedata/conda:v2 $(2)
+make_conda = $(call make, $(1)) -e CONDA_TOKEN=$(CONDA_TOKEN) -i onedata/conda:v1 $(2)
 
 get_release:
 	@echo $(RELEASE)
@@ -195,16 +191,16 @@ test_env_up:
 	${TEST_RUN} --test-type env_up -vvv --test-dir tests/env_up
 
 test_provider_packaging test_packaging:
-	$(call retry, ${TEST_RUN} --error-for-skips --test-type packaging -k "oneprovider" -vvv --test-dir tests/packaging -s)
+	${TEST_RUN} --test-type packaging -k "oneprovider" -vvv --test-dir tests/packaging -s
 
 test_oneclient_base_packaging:
-	$(call retry, ${TEST_RUN} --error-for-skips --test-type packaging -k "oneclient_base" -vvv --test-dir tests/packaging -s)
+	${TEST_RUN} --test-type packaging -k "oneclient_base" -vvv --test-dir tests/packaging -s
 
 test_oneclient_packaging:
-	$(call retry, ${TEST_RUN} --test-type packaging -k "oneclient and not oneclient_base" -vvv --test-dir tests/packaging -s)
+	${TEST_RUN} --test-type packaging -k "oneclient and not oneclient_base" -vvv --test-dir tests/packaging -s
 
 test_fsonedatafs_packaging:
-	$(call retry, ${TEST_RUN} --test-type packaging -k "fsonedatafs" -vvv --test-dir tests/packaging -s)
+	${TEST_RUN} --test-type packaging -k "fsonedatafs" -vvv --test-dir tests/packaging -s
 
 test:
 	${TEST_RUN} --test-type acceptance -vvv --test-dir tests/acceptance/scenarios/${SUITE}.py
@@ -292,13 +288,13 @@ rpm_oneprovider: rpm_op_panel rpm_op_worker rpm_cluster_manager
 	sed -i 's/{{op_worker_version}}/$(OP_WORKER_VERSION)/g' oneprovider_meta/oneprovider.spec
 	sed -i 's/{{op_panel_version}}/$(OP_PANEL_VERSION)/g' oneprovider_meta/oneprovider.spec
 
-	bamboos/docker/make.py -i onedata/rpm_builder:$(DISTRIBUTION)-$(RELEASE)$(PKG_BUILDER_VERSION) \
+	bamboos/docker/make.py -i onedata/rpm_builder:$(DISTRIBUTION)-$(RELEASE) \
 		    -e DISTRIBUTION=$(DISTRIBUTION) -e RELEASE=$(RELEASE) --privileged --group mock -c \
 	        mock --buildsrpm --spec oneprovider_meta/oneprovider.spec \
 	        --sources oneprovider_meta --root $(DISTRIBUTION) \
 	        --resultdir oneprovider_meta/package/packages
 
-	bamboos/docker/make.py -i onedata/rpm_builder:$(DISTRIBUTION)-$(RELEASE)$(PKG_BUILDER_VERSION) \
+	bamboos/docker/make.py -i onedata/rpm_builder:$(DISTRIBUTION)-$(RELEASE) \
 		    -e DISTRIBUTION=$(DISTRIBUTION) -e RELEASE=$(RELEASE) --privileged --group mock -c \
 	        mock --rebuild oneprovider_meta/package/packages/*.src.rpm \
 	        --root $(DISTRIBUTION) --resultdir oneprovider_meta/package/packages
@@ -306,29 +302,29 @@ rpm_oneprovider: rpm_op_panel rpm_op_worker rpm_cluster_manager
 	$(call mv_rpm, oneprovider_meta)
 
 rpm_op_panel: clean_onepanel rpmdirs
-	$(call retry, $(call make_rpm, onepanel, package) -e PKG_VERSION=$(OP_PANEL_VERSION) -e REL_TYPE=oneprovider)
+	$(call make_rpm, onepanel, package) -e PKG_VERSION=$(OP_PANEL_VERSION) -e REL_TYPE=oneprovider
 	$(call mv_rpm, onepanel)
 
 rpm_op_worker: clean_op_worker rpmdirs
-	$(call retry, $(call make_rpm, op_worker, package) -e PKG_VERSION=$(OP_WORKER_VERSION))
+	$(call make_rpm, op_worker, package) -e PKG_VERSION=$(OP_WORKER_VERSION)
 	$(call mv_rpm, op_worker)
 
 rpm_cluster_manager: clean_cluster_manager rpmdirs
-	$(call retry, $(call make_rpm, cluster_manager, package) -e PKG_VERSION=$(CLUSTER_MANAGER_VERSION))
+	$(call make_rpm, cluster_manager, package) -e PKG_VERSION=$(CLUSTER_MANAGER_VERSION)
 	$(call mv_rpm, cluster_manager)
 
 rpm_oneclient_base: clean_oneclient rpmdirs
-	$(call retry, $(call make_rpm, oneclient, rpm) -e PKG_VERSION=$(ONECLIENT_VERSION))
+	$(call make_rpm, oneclient, rpm) -e PKG_VERSION=$(ONECLIENT_VERSION)
 	$(call mv_rpm, oneclient)
 
 rpm_fsonedatafs: clean_fsonedatafs rpmdirs
-	$(call retry, $(call make_rpm, fs-onedatafs, rpm) -e PKG_VERSION=$(FSONEDATAFS_VERSION) -e ONECLIENT_VERSION=$(ONECLIENT_VERSION))
+	$(call make_rpm, fs-onedatafs, rpm) -e PKG_VERSION=$(FSONEDATAFS_VERSION) -e ONECLIENT_VERSION=$(ONECLIENT_VERSION)
 	$(call mv_noarch_rpm, fs-onedatafs)
 
 rpm_onedatafs_jupyter: clean_onedatafs_jupyter rpmdirs
-	$(call retry, $(call make_rpm, onedatafs-jupyter, rpm) -e PKG_VERSION=$(ONEDATAFS_JUPYTER_VERSION) \
+	$(call make_rpm, onedatafs-jupyter, rpm) -e PKG_VERSION=$(ONEDATAFS_JUPYTER_VERSION) \
 		                                     -e FSONEDATAFS_VERSION=$(FSONEDATAFS_VERSION) \
-		                                     -e ONECLIENT_VERSION=$(ONECLIENT_VERSION))
+		                                     -e ONECLIENT_VERSION=$(ONECLIENT_VERSION)
 	$(call mv_noarch_rpm, onedatafs-jupyter)
 
 rpmdirs:
@@ -516,4 +512,4 @@ onedatafs_jupyter_conda:
 
 
 codetag-tracker:
-	./bamboos/scripts/codetag-tracker.sh --branch=${BRANCH} --excluded-dirs=node_package,oneclient,fs-onedatafs
+	@echo "Skipping codetag-tracker for release version 20.02.*"
