@@ -23,7 +23,7 @@ instead of directly invoking Git `submodule` commands.
 
 ## Building
 
-In order to build oneclient packages and docker images by invoke:
+In order to build oneclient packages and docker images invoke:
 
 ```bash
 make
