@@ -1,12 +1,6 @@
 # distro for package building (oneof: xenial, bionic, focal, centos-7-x86_64)
 DISTRIBUTION            ?= none
 RELEASE                 ?= $(shell cat ./RELEASE)
-DOCKER_RELEASE          ?= development
-DOCKER_REG_NAME         ?= "docker.onedata.org"
-DOCKER_REG_USER         ?= ""
-DOCKER_REG_PASSWORD     ?= ""
-PROD_RELEASE_BASE_IMAGE ?= "onedata/oneprovider-common:2102-3"
-DEV_RELEASE_BASE_IMAGE  ?= "onedata/oneprovider-dev-common:2102-6"
 HTTP_PROXY              ?= "http://proxy.devel.onedata.org:3128"
 CONDA_TOKEN             ?= ""
 CONDA_BUILD_OPTIONS     ?= ""

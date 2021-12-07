@@ -1,4 +1,3 @@
-![Onedata](resources/logo.png)
 This repository contains the necessary code for building oneclient packages.
 Oneclient is part of [Onedata](http://onedata.org) - the global data management system.
 
@@ -9,10 +8,10 @@ The following submodules are used in the repository:
 
 | Submodule | URL      | Description |
 |-----------|----------|--------------|
+| **Bamboo scripts** | https://github.com/onedata/bamboos | Bamboos contains common scripts used in Continuous Integration processes that use the Bamboo platform. |
 | **Oneclient** | https://github.com/onedata/oneclient | Oneclient command line tool implementation. |
-| **Bamboo scripts** | https://github.com/onedata/bamboos | Bamboos is used for automating test deployments in [bamboo](https://www.atlassian.com/software/bamboo) during Onedata integration tests. |
 | **fs-onedatafs** |  https://github.com/onedata/fs-onedatafs | Onedata filesystem python libraries |
-| **onedatafs-jupyter** |  https://github.com/onedata/onedatafs-jupyter | Onedata filesyste jupyter plugin |
+| **onedatafs-jupyter** |  https://github.com/onedata/onedatafs-jupyter | Onedata filesystem jupyter plugin |
 
 
 In order to initialize all submodules please use:
