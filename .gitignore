@@ -11,9 +11,6 @@ tests/**/.cache
 package
 docker-build-list.json
 docker-build-report.txt
-onezone_meta/package
-onezone_meta/onezone.spec
-onezone_meta/onezone/DEBIAN/control
 
 # OSX
 .DS_Store
