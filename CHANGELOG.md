@@ -6,6 +6,8 @@ CHANGELOG
 
 ### 20.02.15
 
+### 20.02.14
+
 ### 20.02.13
 
 -   **VFS-8335** Fix a regression in proxied access to spaces (ones not
