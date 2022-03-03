@@ -1,0 +1,17 @@
+*.iml
+.idea
+
+*.pyc
+
+test-reports/*
+
+.cache
+tests/**/.cache
+
+package
+docker-build-list.json
+docker-build-report.txt
+
+# OSX
+.DS_Store
+
