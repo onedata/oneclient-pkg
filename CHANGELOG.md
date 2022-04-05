@@ -8,7 +8,6 @@ CHANGELOG
 
 -   **VFS-8747** Pinned boost dependency on conda to 1.76.0.
 
-
 ### 21.02.0-alpha23
 
 -   **VFS-8425** Added basic cookie support to HTTP storage helper to
@@ -229,7 +228,17 @@ CHANGELOG
     Fixed inability to open share hosted by Oneprovider 19.02.x using
     Onezone 20.02.x.
 
+### 20.02.16
+
+-   **VFS-8828** Fixed conda packages for the stable branch 20.02.\*,
+    starting with version 20.02.15 and Python 3.9.
+-   **VFS-8823** Fixed improper destruction of OnedataFS instances,
+    resulting in possible deadlocks during deletion of the OnedataFS
+    object.
+
 ### 20.02.15
+
+### 20.02.14
 
 ### 20.02.13
 
