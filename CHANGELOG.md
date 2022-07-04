@@ -245,6 +245,10 @@ CHANGELOG
     Fixed inability to open share hosted by Oneprovider 19.02.x using
     Onezone 20.02.x.
 
+### 20.02.17
+
+-   **VFS-9424** Fixed broken dependencies in Oneclient Conda packages.
+
 ### 20.02.16
 
 -   **VFS-8828** Fixed conda packages for the stable branch 20.02.\*,
