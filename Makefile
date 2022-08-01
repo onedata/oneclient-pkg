@@ -97,7 +97,7 @@ submodules:
 ## Build
 ##
 
-build: build_oneclient 
+build: build_oneclient
 
 build_oneclient: submodules
 	$(call make, oneclient) deb-info
@@ -106,7 +106,7 @@ build_oneclient: submodules
 ## Artifacts
 ##
 
-artifact:  artifact_oneclient 
+artifact:  artifact_oneclient
 
 artifact_oneclient:
 	$(call unpack, oneclient)
