@@ -4,6 +4,8 @@ Release notes for project oneclient-pkg
 CHANGELOG
 ---------
 
+### 21.02.0-alpha27
+
 ### 21.02.0-alpha26
 
 -   **VFS-9424** Fixed broken dependencies in Oneclient Conda packages.
