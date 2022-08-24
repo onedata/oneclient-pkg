@@ -7,6 +7,13 @@ CONDA_BUILD_OPTIONS     ?= ""
 RETRIES                 ?= 0
 RETRY_SLEEP             ?= 300
 
+DOCKER_RELEASE        ?= development
+DOCKER_REG_NAME       ?= "docker.onedata.org"
+DOCKER_REG_USER       ?= ""
+DOCKER_REG_PASSWORD   ?= ""
+DOCKER_BASE_IMAGE     ?= "ubuntu:18.04"
+DOCKER_DEV_BASE_IMAGE ?= "onedata/worker:2002-2"
+
 ifeq ($(strip $(ONECLIENT_VERSION)),)
 ONECLIENT_VERSION       := $(shell git -C oneclient describe --tags --always --abbrev=7)
 endif
@@ -19,6 +26,13 @@ endif
 ifeq ($(strip $(ONEDATAFS_JUPYTER_VERSION)),)
 ONEDATAFS_JUPYTER_VERSION       := $(shell git -C onedatafs-jupyter describe --tags --always)
 endif
+ifeq ($(strip $(ONECLIENT_BASE_IMAGE)),)
+# Oneclient base image is an ID of the Docker container 'oneclient-base' with
+# containing Oneclient installed on a reference OS (currently Ubuntu Bionic).
+# This image is used to create self-contained binary packages for other distributions.
+ONECLIENT_BASE_IMAGE    := ID-$(shell git rev-parse HEAD | cut -c1-10)
+endif
+
 
 ONECLIENT_VERSION             := $(shell echo ${ONECLIENT_VERSION} | tr - .)
 FSONEDATAFS_VERSION           := $(shell echo ${FSONEDATAFS_VERSION} | tr - .)
@@ -206,20 +220,53 @@ package.tar.gz:
 # Build intermediate Oneclient Docker image with oneclient installed from
 # a normal (oneclient-base) package into /usr/ prefix.
 #
+.PHONY: docker_oneclient_base
 docker_oneclient_base:
-	$(MAKE) -C oneclient docker-base PKG_VERSION=$(ONECLIENT_VERSION) RELEASE=$(RELEASE) \
-		                             FSONEDATAFS_VERSION=$(FSONEDATAFS_VERSION) \
-		                             HTTP_PROXY=$(HTTP_PROXY)
+	./docker_build.py --repository $(DOCKER_REG_NAME) --user $(DOCKER_REG_USER) \
+                          --password $(DOCKER_REG_PASSWORD) \
+                          --build-arg BASE_IMAGE=$(DOCKER_BASE_IMAGE) \
+                          --build-arg RELEASE_TYPE=$(DOCKER_RELEASE) \
+                          --build-arg RELEASE=$(RELEASE) \
+                          --build-arg VERSION=$(ONECLIENT_VERSION) \
+                          --build-arg FSONEDATAFS_VERSION=$(FSONEDATAFS_VERSION) \
+                          --build-arg HTTP_PROXY=$(HTTP_PROXY) \
+                          --build-arg ONECLIENT_PACKAGE=oneclient-base \
+                          --name oneclient-base --publish --remove docker
+
 
 #
 # Build final Oneclient Docker image with oneclient installed from
 # self contained package (oneclient) into /opt/oneclient prefix and
 # symlinked into /usr prefix.
 #
-docker_oneclient:
-	$(MAKE) -C oneclient docker PKG_VERSION=$(ONECLIENT_VERSION) RELEASE=$(RELEASE) \
-                                FSONEDATAFS_VERSION=$(FSONEDATAFS_VERSION) \
-                                HTTP_PROXY=$(HTTP_PROXY)
+.PHONY: docker_oneclient
+docker_oneclient: docker-dev
+	./docker_build.py --repository $(DOCKER_REG_NAME) \
+	                  --user $(DOCKER_REG_USER) \
+                      --password $(DOCKER_REG_PASSWORD) \
+                      --build-arg BASE_IMAGE=$(DOCKER_BASE_IMAGE) \
+                      --build-arg RELEASE_TYPE=$(DOCKER_RELEASE) \
+                      --build-arg RELEASE=$(RELEASE) \
+                      --build-arg VERSION=$(ONECLIENT_VERSION) \
+                      --build-arg FSONEDATAFS_VERSION=$(FSONEDATAFS_VERSION) \
+                      --build-arg HTTP_PROXY=$(HTTP_PROXY) \
+                      --build-arg ONECLIENT_PACKAGE=oneclient \
+                      --name oneclient --publish --remove docker
+
+.PHONY: docker-dev
+docker-dev:
+	./docker_build.py --repository $(DOCKER_REG_NAME) \
+                      --user $(DOCKER_REG_USER) \
+                      --password $(DOCKER_REG_PASSWORD) \
+                      --build-arg BASE_IMAGE=$(DOCKER_DEV_BASE_IMAGE) \
+                      --build-arg RELEASE=$(RELEASE) \
+                      --build-arg VERSION=$(ONECLIENT_VERSION) \
+                      --build-arg FSONEDATAFS_VERSION=$(FSONEDATAFS_VERSION) \
+                      --build-arg HTTP_PROXY=$(HTTP_PROXY) \
+                      --build-arg ONECLIENT_PACKAGE=oneclient \
+                      --report docker-dev-build-report.txt \
+                      --short-report docker-dev-build-list.json \
+                      --name oneclient-dev --publish --remove docker
 
 #
 # Build Jupyter Docker with OnedataFS content manager plugin
@@ -236,7 +283,7 @@ docker_onedatafs_jupyter:
 # from intermediate Oneclient Docker image (oneclient-base)
 #
 oneclient_tar oneclient/$(ONECLIENT_FPMPACKAGE_TMP)/oneclient-bin.tar.gz:
-	$(MAKE) -C oneclient oneclient_tar
+	$(MAKE) -C oneclient ONECLIENT_BASE_IMAGE=$(ONECLIENT_BASE_IMAGE) oneclient_tar
 
 #
 # Build production Oneclient RPM using FPM tool from self contained archive
