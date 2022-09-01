@@ -24,6 +24,7 @@ ONECLIENT_VERSION             := $(shell echo ${ONECLIENT_VERSION} | tr - .)
 FSONEDATAFS_VERSION           := $(shell echo ${FSONEDATAFS_VERSION} | tr - .)
 ONEDATAFS_JUPYTER_VERSION     := $(shell echo ${ONEDATAFS_JUPYTER_VERSION} | tr - .)
 
+PKG_BUILDER_VERSION     ?= -3
 ONECLIENT_FPMPACKAGE_TMP ?= package_fpm
 
 ifdef IGNORE_XFAIL
@@ -290,4 +291,4 @@ onedatafs_jupyter_conda:
 
 
 codetag-tracker:
-	@echo "Skipping codetag-tracker for release version 20.02.*"
+	./bamboos/scripts/codetag-tracker.sh --branch=${BRANCH} --excluded-dirs=node_package,oneclient,fs-onedatafs
