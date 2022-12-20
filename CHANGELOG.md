@@ -4,6 +4,11 @@ Release notes for project oneclient-pkg
 CHANGELOG
 ---------
 
+### 21.02.0-rc1
+
+-   **VFS-10174** Fixed possible crash in the nulldevice helper when
+    simulating large filesystems for importing to data space.
+
 ### 21.02.0-alpha28
 
 ### 21.02.0-alpha27
