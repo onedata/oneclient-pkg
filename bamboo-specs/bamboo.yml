@@ -1206,11 +1206,11 @@ Publish Oneclient docker:
   - onedata
   artifact-subscriptions: []
 variables:
-  CLUSTER_MANAGER_VERSION: ''
-  ONECLIENT_VERSION: ''
-  ONEPROVIDER_VERSION: ''
-  OP_PANEL_VERSION: ''
-  OP_WORKER_VERSION: ''
+  # CLUSTER_MANAGER_VERSION: ''
+  # ONECLIENT_VERSION: ''
+  # ONEPROVIDER_VERSION: ''
+  # OP_PANEL_VERSION: ''
+  # OP_WORKER_VERSION: ''
 repositories:
 - oneclient-pkg:
     scope: global
