@@ -4,6 +4,10 @@ Release notes for project oneclient-pkg
 CHANGELOG
 ---------
 
+### 21.02.0-alpha28
+
+### 21.02.0-alpha27
+
 ### 21.02.0-alpha26
 
 -   **VFS-9424** Fixed broken dependencies in Oneclient Conda packages.
@@ -256,6 +260,15 @@ CHANGELOG
 -   **VFS-6566** Improved UX and fixed minor issues in share views.
     Fixed inability to open share hosted by Oneprovider 19.02.x using
     Onezone 20.02.x.
+
+### 20.02.19
+
+-   **VFS-10008** Fixed race condition which occurred when a file
+    location was retrieved through getxattr call concurrently to file
+    release.
+
+
+### 20.02.18
 
 ### 20.02.17
 
