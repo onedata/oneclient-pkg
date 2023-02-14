@@ -14,6 +14,7 @@ ARG PYFILESYSTEM_VERSION="2.4.14"
 
 # Enable Onedata devel package proxy cache
 ENV http_proxy ${HTTP_PROXY}
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Get the image up to date and install utility tools
 RUN apt-get -y update && \
