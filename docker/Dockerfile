@@ -19,7 +19,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Get the image up to date and install utility tools
 RUN apt-get -y update && \
     apt-get -y install bash-completion ca-certificates curl iputils-ping netcat \
-                       man-db net-tools traceroute vim python-xattr python3-xattr \
+                       man-db net-tools traceroute vim python3-xattr \
                        parallel python3-pip gnupg2 xattr pv bsdmainutils && \
     apt-get clean
 
