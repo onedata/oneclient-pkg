@@ -11,14 +11,14 @@ stages:
     manual: false
     final: false
     jobs:
-    - Build fs-onedatafs Bionic package
+    - Build fs-onedatafs Focal package
     - Build fs-onedatafs CentOS package
     # - Build oneclient-base and onedatafs Xenial packages
     - Build onedatafs-jupyter CentOS package
     # - Build fs-onedatafs Xenial package
-    - Build onedatafs-jupyter Bionic package
+    - Build onedatafs-jupyter Focal package
     # - Build onedatafs-jupyter Xenial package
-    - Build oneclient-base and onedatafs Bionic packages
+    - Build oneclient-base and onedatafs Focal packages
     - Build oneclient-base and onedatafs CentOS packages
 - Test OnedataFS:
     description: Test created packages
@@ -71,7 +71,7 @@ stages:
     jobs:
     # - Publish OnedataFS Jupyter docker
     - Publish Oneclient docker
-Build fs-onedatafs Bionic package:
+Build fs-onedatafs Focal package:
   key: BFBP
   other:
     clean-working-dir: true
@@ -94,14 +94,14 @@ Build fs-onedatafs Bionic package:
         git remote -v
         make submodules
 
-        DISTRIBUTION=bionic \
+        DISTRIBUTION=focal \
         ONECLIENT_VERSION=$bamboo_ONECLIENT_VERSION \
         make deb_fsonedatafs
       description: Build Oneclient Base and OnedataFS Xenial
   - script:
       interpreter: BINSH_OR_CMDEXE
       scripts:
-      - tar -chzf bionic-fsonedatafs.tar.gz package
+      - tar -chzf focal-fsonedatafs.tar.gz package
       description: Package
   final-tasks:
   - script:
@@ -110,8 +110,8 @@ Build fs-onedatafs Bionic package:
       - curl ${bamboo.OnedataFinalTasksURL} | bash -
       description: Clear env
   artifacts:
-  - name: bionic-fsonedatafs.tar.gz
-    pattern: bionic-fsonedatafs.tar.gz
+  - name: focal-fsonedatafs.tar.gz
+    pattern: focal-fsonedatafs.tar.gz
     shared: true
     required: false
   requirements:
@@ -313,7 +313,7 @@ Build onedatafs-jupyter CentOS package:
 #   - onedata
 #   - onedata-pkg-builder
 #   artifact-subscriptions: []
-Build onedatafs-jupyter Bionic package:
+Build onedatafs-jupyter Focal package:
   key: BOBP
   other:
     clean-working-dir: true
@@ -336,14 +336,14 @@ Build onedatafs-jupyter Bionic package:
         git remote -v
         make submodules
 
-        DISTRIBUTION=bionic \
+        DISTRIBUTION=focal \
         ONECLIENT_VERSION=$bamboo_ONECLIENT_VERSION \
         make deb_onedatafs_jupyter
       description: Build Oneclient Base and OnedataFS Xenial
   - script:
       interpreter: BINSH_OR_CMDEXE
       scripts:
-      - tar -chzf bionic-onedatafs-jupyter.tar.gz package
+      - tar -chzf focal-onedatafs-jupyter.tar.gz package
       description: Package
   final-tasks:
   - script:
@@ -352,8 +352,8 @@ Build onedatafs-jupyter Bionic package:
       - curl ${bamboo.OnedataFinalTasksURL} | bash -
       description: Clear env
   artifacts:
-  - name: bionic-onedatafs-jupyter.tar.gz
-    pattern: bionic-onedatafs-jupyter.tar.gz
+  - name: focal-onedatafs-jupyter.tar.gz
+    pattern: focal-onedatafs-jupyter.tar.gz
     shared: true
     required: false
   requirements:
@@ -409,7 +409,7 @@ Build onedatafs-jupyter Bionic package:
 #   - onedata
 #   - onedata-pkg-builder
 #   artifact-subscriptions: []
-Build oneclient-base and onedatafs Bionic packages:
+Build oneclient-base and onedatafs Focal packages:
   key: BOOBP
   other:
     clean-working-dir: true
@@ -432,18 +432,18 @@ Build oneclient-base and onedatafs Bionic packages:
         git remote -v
         make submodules
 
-        echo DISTRIBUTION=bionic \
+        echo DISTRIBUTION=focal \
         ONECLIENT_VERSION=$bamboo_ONECLIENT_VERSION \
         make deb_oneclient_base
 
-        DISTRIBUTION=bionic \
+        DISTRIBUTION=focal \
         ONECLIENT_VERSION=$bamboo_ONECLIENT_VERSION \
         make deb_oneclient_base
       description: Build Oneclient Base and OnedataFS Xenial
   - script:
       interpreter: BINSH_OR_CMDEXE
       scripts:
-      - tar -chzf bionic-oneclient-base.tar.gz package
+      - tar -chzf focal-oneclient-base.tar.gz package
       description: Package
   final-tasks:
   - script:
@@ -452,8 +452,8 @@ Build oneclient-base and onedatafs Bionic packages:
       - curl ${bamboo.OnedataFinalTasksURL} | bash -
       description: Clear env
   artifacts:
-  - name: bionic-oneclient-base.tar.gz
-    pattern: bionic-oneclient-base.tar.gz
+  - name: focal-oneclient-base.tar.gz
+    pattern: focal-oneclient-base.tar.gz
     shared: true
     required: false
   requirements:
@@ -539,9 +539,9 @@ Test fs-onedatafs:
       interpreter: BINSH_OR_CMDEXE
       scripts:
       - |-
-        tar -xzf bionic-oneclient-base.tar.gz
+        tar -xzf focal-oneclient-base.tar.gz
         tar -xzf centos7-oneclient-base.tar.gz
-        tar -xzf bionic-fsonedatafs.tar.gz
+        tar -xzf focal-fsonedatafs.tar.gz
         tar -xzf centos7-fsonedatafs.tar.gz
       description: Unpack package artifacts
   - script:
@@ -565,8 +565,8 @@ Test fs-onedatafs:
   artifact-subscriptions:
   - artifact: centos7-oneclient-base.tar.gz
   - artifact: centos7-fsonedatafs.tar.gz
-  - artifact: bionic-fsonedatafs.tar.gz
-  - artifact: bionic-oneclient-base.tar.gz
+  - artifact: focal-fsonedatafs.tar.gz
+  - artifact: focal-oneclient-base.tar.gz
 Publish Oneclient base package:
   key: PD
   other:
@@ -584,7 +584,32 @@ Publish Oneclient base package:
   - script:
       interpreter: BINSH_OR_CMDEXE
       scripts:
-      - "set -e\ngit remote set-url origin ${bamboo.repository.git.repositoryUrl}\ngit remote -v\nmake submodule=bamboos submodules\n\n# Check if the repo contains RELEASE file containing major Onedata release tag (e.g. 1802)\n# If not publish to legacy repositories\nif test -f RELEASE; then\n    RELEASE=$(cat RELEASE)\n    ./pkg.py --host docker_packages_devel --release $RELEASE push bionic-oneclient-base.tar.gz\n    mv pkg-list.json bionic-pkg-list.json    \n    ./pkg.py --host docker_packages_devel --release $RELEASE push centos7-oneclient-base.tar.gz\n    mv pkg-list.json centos7-pkg-list.json    \n    ./pkg.py --host docker_packages_devel --release $RELEASE push bionic-fsonedatafs.tar.gz\n    mv pkg-list.json bionic-fsonedatafs-pkg-list.json    \n    ./pkg.py --host docker_packages_devel --release $RELEASE push centos7-fsonedatafs.tar.gz\n    mv pkg-list.json centos7-fsonedatafs-pkg-list.json\n    ./pkg.py --host docker_packages_devel --release $RELEASE push bionic-onedatafs-jupyter.tar.gz\n    mv pkg-list.json bionic-onedatafs-jupyter-pkg-list.json    \n    ./pkg.py --host docker_packages_devel --release $RELEASE push centos7-onedatafs-jupyter.tar.gz\n    mv pkg-list.json centos7-onedatafs-jupyter-pkg-list.json          \nelse\n    ./pkg.py --host docker_packages_devel push xenial-oneclient-base.tar.gz\n    mv pkg-list.json xenial-pkg-list.json\nfi"
+      - |-
+        set -e
+        git remote set-url origin ${bamboo.repository.git.repositoryUrl}
+        git remote -v
+        make submodule=bamboos submodules
+
+        # Check if the repo contains RELEASE file containing major Onedata release tag (e.g. 1802)
+        # If not publish to legacy repositories
+        if test -f RELEASE; then
+            RELEASE=$(cat RELEASE)
+            ./pkg.py --host docker_packages_devel --release $RELEASE push focal-oneclient-base.tar.gz
+            mv pkg-list.json focal-pkg-list.json
+            ./pkg.py --host docker_packages_devel --release $RELEASE push centos7-oneclient-base.tar.gz
+            mv pkg-list.json centos7-pkg-list.json
+            ./pkg.py --host docker_packages_devel --release $RELEASE push focal-fsonedatafs.tar.gz
+            mv pkg-list.json focal-fsonedatafs-pkg-list.json
+            ./pkg.py --host docker_packages_devel --release $RELEASE push centos7-fsonedatafs.tar.gz
+            mv pkg-list.json centos7-fsonedatafs-pkg-list.json
+            ./pkg.py --host docker_packages_devel --release $RELEASE push focal-onedatafs-jupyter.tar.gz
+            mv pkg-list.json focal-onedatafs-jupyter-pkg-list.json
+            ./pkg.py --host docker_packages_devel --release $RELEASE push centos7-onedatafs-jupyter.tar.gz
+            mv pkg-list.json centos7-onedatafs-jupyter-pkg-list.json
+        else
+            ./pkg.py --host docker_packages_devel push xenial-oneclient-base.tar.gz
+            mv pkg-list.json xenial-pkg-list.json
+        fi
       description: Publish
   final-tasks:
   - script:
@@ -609,12 +634,12 @@ Publish Oneclient base package:
     pattern: xenial-fsonedatafs-pkg-list.json
     shared: true
     required: false
-  - name: bionic-fsonedatafs-pkg-list.json
-    pattern: bionic-fsonedatafs-pkg-list.json
+  - name: focal-fsonedatafs-pkg-list.json
+    pattern: focal-fsonedatafs-pkg-list.json
     shared: true
     required: false
-  - name: bionic-pkg-list.json
-    pattern: bionic-pkg-list.json
+  - name: focal-pkg-list.json
+    pattern: focal-pkg-list.json
     shared: true
     required: false
   requirements:
@@ -623,9 +648,9 @@ Publish Oneclient base package:
   artifact-subscriptions:
   - artifact: centos7-oneclient-base.tar.gz
   - artifact: centos7-fsonedatafs.tar.gz
-  - artifact: bionic-fsonedatafs.tar.gz
-  - artifact: bionic-oneclient-base.tar.gz
-  - artifact: bionic-onedatafs-jupyter.tar.gz
+  - artifact: focal-fsonedatafs.tar.gz
+  - artifact: focal-oneclient-base.tar.gz
+  - artifact: focal-onedatafs-jupyter.tar.gz
   - artifact: centos7-onedatafs-jupyter.tar.gz
 Publish Oneclient base docker:
   key: BD
@@ -671,7 +696,13 @@ Build oneclient archive:
   - script:
       interpreter: BINSH_OR_CMDEXE
       scripts:
-      - "set -e \n\ngit remote set-url origin ${bamboo.repository.git.repositoryUrl}\ngit remote -v\nmake submodule=bamboos submodules\nmake submodule=oneclient submodules"
+      - |-
+        set -e
+
+        git remote set-url origin ${bamboo.repository.git.repositoryUrl}
+        git remote -v
+        make submodule=bamboos submodules
+        make submodule=oneclient submodules
       description: Build modules
   - script:
       interpreter: BINSH_OR_CMDEXE
@@ -699,7 +730,16 @@ Oneclient Ubuntu Xenial:
   - script:
       interpreter: BINSH_OR_CMDEXE
       scripts:
-      - "set -e \n\ngit remote set-url origin ${bamboo.repository.git.repositoryUrl}\ngit remote -v\nmake submodule=bamboos submodules\nmake submodule=oneclient submodules\n\nmkdir oneclient/package_fpm\nmv oneclient-bin.tar.gz oneclient/package_fpm/oneclient-bin.tar.gz"
+      - |-
+        set -e
+
+        git remote set-url origin ${bamboo.repository.git.repositoryUrl}
+        git remote -v
+        make submodule=bamboos submodules
+        make submodule=oneclient submodules
+
+        mkdir oneclient/package_fpm
+        mv oneclient-bin.tar.gz oneclient/package_fpm/oneclient-bin.tar.gz
       description: Build modules
   - script:
       interpreter: BINSH_OR_CMDEXE
@@ -768,7 +808,16 @@ Oneclient Ubuntu Focal:
   - script:
       interpreter: BINSH_OR_CMDEXE
       scripts:
-      - "set -e \n\ngit remote set-url origin ${bamboo.repository.git.repositoryUrl}\ngit remote -v\nmake submodule=bamboos submodules\nmake submodule=oneclient submodules\n\nmkdir oneclient/package_fpm\nmv oneclient-bin.tar.gz oneclient/package_fpm/oneclient-bin.tar.gz"
+      - |-
+        set -e
+
+        git remote set-url origin ${bamboo.repository.git.repositoryUrl}
+        git remote -v
+        make submodule=bamboos submodules
+        make submodule=oneclient submodules
+
+        mkdir oneclient/package_fpm
+        mv oneclient-bin.tar.gz oneclient/package_fpm/oneclient-bin.tar.gz
       description: Build modules
   - script:
       interpreter: BINSH_OR_CMDEXE
@@ -802,7 +851,16 @@ Oneclient Ubuntu Trusty:
   - script:
       interpreter: BINSH_OR_CMDEXE
       scripts:
-      - "set -e \n\ngit remote set-url origin ${bamboo.repository.git.repositoryUrl}\ngit remote -v\nmake submodule=bamboos submodules\nmake submodule=oneclient submodules\n\nmkdir oneclient/package_fpm\nmv oneclient-bin.tar.gz oneclient/package_fpm/oneclient-bin.tar.gz"
+      - |-
+        set -e
+
+        git remote set-url origin ${bamboo.repository.git.repositoryUrl}
+        git remote -v
+        make submodule=bamboos submodules
+        make submodule=oneclient submodules
+
+        mkdir oneclient/package_fpm
+        mv oneclient-bin.tar.gz oneclient/package_fpm/oneclient-bin.tar.gz
       description: Build modules
   - script:
       interpreter: BINSH_OR_CMDEXE
@@ -836,7 +894,16 @@ Oneclient Ubuntu Bionic:
   - script:
       interpreter: BINSH_OR_CMDEXE
       scripts:
-      - "set -e \n\ngit remote set-url origin ${bamboo.repository.git.repositoryUrl}\ngit remote -v\nmake submodule=bamboos submodules\nmake submodule=oneclient submodules\n\nmkdir oneclient/package_fpm\nmv oneclient-bin.tar.gz oneclient/package_fpm/oneclient-bin.tar.gz"
+      - |-
+        set -e
+
+        git remote set-url origin ${bamboo.repository.git.repositoryUrl}
+        git remote -v
+        make submodule=bamboos submodules
+        make submodule=oneclient submodules
+
+        mkdir oneclient/package_fpm
+        mv oneclient-bin.tar.gz oneclient/package_fpm/oneclient-bin.tar.gz
       description: Build modules
   - script:
       interpreter: BINSH_OR_CMDEXE
@@ -870,7 +937,16 @@ Oneclient CentOS7:
   - script:
       interpreter: BINSH_OR_CMDEXE
       scripts:
-      - "set -e \n\ngit remote set-url origin ${bamboo.repository.git.repositoryUrl}\ngit remote -v\nmake submodule=bamboos submodules\nmake submodule=oneclient submodules\n\nmkdir oneclient/package_fpm\nmv oneclient-bin.tar.gz oneclient/package_fpm/oneclient-bin.tar.gz"
+      - |-
+        set -e 
+
+        git remote set-url origin ${bamboo.repository.git.repositoryUrl}
+        git remote -v
+        make submodule=bamboos submodules
+        make submodule=oneclient submodules
+
+        mkdir oneclient/package_fpm
+        mv oneclient-bin.tar.gz oneclient/package_fpm/oneclient-bin.tar.gz
       description: Build modules
   - script:
       interpreter: BINSH_OR_CMDEXE
@@ -904,14 +980,20 @@ Oneclient Ubuntu Jammy:
   - script:
       interpreter: BINSH_OR_CMDEXE
       scripts:
-      - "set -e \n\ngit remote set-url origin ${bamboo.repository.git.repositoryUrl}\ngit remote -v\nmake submodule=bamboos submodules\nmake submodule=oneclient submodules\n\nmkdir oneclient/package_fpm\nmv oneclient-bin.tar.gz oneclient/package_fpm/oneclient-bin.tar.gz"
+      - |-
+        set -e 
+        git remote set-url origin ${bamboo.repository.git.repositoryUrl}
+        git remote -v
+        make submodule=bamboos submodules
+        make submodule=oneclient submodules
+        mkdir oneclient/package_fpm
+        mv oneclient-bin.tar.gz oneclient/package_fpm/oneclient-bin.tar.gz
       description: Build modules
   - script:
       interpreter: BINSH_OR_CMDEXE
       scripts:
       - |-
         set -e
-
         make DISTRIBUTION=jammy oneclient_deb
       description: Build Oneclient Jammy package
   - script:
@@ -1005,7 +1087,35 @@ Publish Oneclient packages:
   - script:
       interpreter: BINSH_OR_CMDEXE
       scripts:
-      - "set -e\n\ngit remote set-url origin ${bamboo.repository.git.repositoryUrl}\ngit remote -v\nmake submodule=bamboos submodules\n\n# Check if the repo contains RELEASE file containing major Onedata release tag (e.g. 1802)\n# If not publish to legacy repositories\nif test -f RELEASE; then\n    RELEASE=$(cat RELEASE)\n    ./pkg.py --host docker_packages_devel --release $RELEASE push centos7-oneclient.tar.gz\n    mv pkg-list.json centos7-oneclient-pkg-list.json\n    ./pkg.py --host docker_packages_devel --release $RELEASE push xenial-oneclient.tar.gz\n    mv pkg-list.json xenial-oneclient-pkg-list.json\n    ./pkg.py --host docker_packages_devel --release $RELEASE push bionic-oneclient.tar.gz\n    mv pkg-list.json bionic-oneclient-pkg-list.json    \n    ./pkg.py --host docker_packages_devel --release $RELEASE push focal-oneclient.tar.gz\n    mv pkg-list.json focal-oneclient-pkg-list.json        \n    ./pkg.py --host docker_packages_devel --release $RELEASE push jammy-oneclient.tar.gz\n    mv pkg-list.json jammy-oneclient-pkg-list.json        \nelse\n    ./pkg.py --host docker_packages_devel push centos7-oneclient.tar.gz\n    mv pkg-list.json centos7-oneclient-pkg-list.json\n    ./pkg.py --host docker_packages_devel push trusty-oneclient.tar.gz\n    mv pkg-list.json trusty-oneclient-pkg-list.json\n    ./pkg.py --host docker_packages_devel push xenial-oneclient.tar.gz\n    mv pkg-list.json xenial-oneclient-pkg-list.json\nfi"
+      - |-
+        set -e
+
+        git remote set-url origin ${bamboo.repository.git.repositoryUrl}
+        git remote -v
+        make submodule=bamboos submodules
+
+        # Check if the repo contains RELEASE file containing major Onedata release tag (e.g. 1802)
+        # If not publish to legacy repositories
+        if test -f RELEASE; then
+          RELEASE=$(cat RELEASE)
+          ./pkg.py --host docker_packages_devel --release $RELEASE push centos7-oneclient.tar.gz
+          mv pkg-list.json centos7-oneclient-pkg-list.json
+          ./pkg.py --host docker_packages_devel --release $RELEASE push xenial-oneclient.tar.gz
+          mv pkg-list.json xenial-oneclient-pkg-list.json
+          ./pkg.py --host docker_packages_devel --release $RELEASE push bionic-oneclient.tar.gz
+          mv pkg-list.json bionic-oneclient-pkg-list.json    
+          ./pkg.py --host docker_packages_devel --release $RELEASE push focal-oneclient.tar.gz
+          mv pkg-list.json focal-oneclient-pkg-list.json        
+          ./pkg.py --host docker_packages_devel --release $RELEASE push jammy-oneclient.tar.gz
+          mv pkg-list.json jammy-oneclient-pkg-list.json        
+        else
+          ./pkg.py --host docker_packages_devel push centos7-oneclient.tar.gz
+          mv pkg-list.json centos7-oneclient-pkg-list.json
+          ./pkg.py --host docker_packages_devel push trusty-oneclient.tar.gz
+          mv pkg-list.json trusty-oneclient-pkg-list.json
+          ./pkg.py --host docker_packages_devel push xenial-oneclient.tar.gz
+          mv pkg-list.json xenial-oneclient-pkg-list.json
+        fi
       description: Publish
   final-tasks:
   - script:
@@ -1255,9 +1365,4 @@ plan-permissions:
   - build
   - clone
   - admin
-- users:
-  - plgcwiertni
-  permissions:
-  - view
-  - build
 ...
