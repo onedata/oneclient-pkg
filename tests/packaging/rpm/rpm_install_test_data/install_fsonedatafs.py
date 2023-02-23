@@ -14,8 +14,6 @@ fsonedatafs_py3_package = [path for path in packages
 check_call(['yum', '-y', 'install', 'python36-pip'])
 check_call(['pip3', 'install', 'setuptools', 'six', 'fs'])
 
-#check_call(['sleep', '360000']) # FIXME: Remove after testing
-
 # install onedatafs packages for Python3
 check_call(['yum', '-y', '--enablerepo=onedata', 'install',
             '/root/pkg/' + onedatafs_py3_package], stderr=STDOUT)
