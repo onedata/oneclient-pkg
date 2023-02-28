@@ -22,6 +22,12 @@ check_call(['yum', '-y', '--enablerepo=onedata', 'install',
 check_call(['yum', '-y', '--enablerepo=onedata', 'install',
             '/root/pkg/' + fsonedatafs_py3_package], stderr=STDOUT)
 
+# Remove glusterfs libs comming from onedata2102 repo
+# After publishing stable 21.02 the libs should be removed from repo 
+# as well as the erasing check_call here
+# TODO VFS-10570 Remove after publishing stable release 21.02
+check_call(['yum', '-y', 'erase', 'onedata2102-glusterfs-libs', 'onedata2102-glusterfs', 'onedata2102-glusterfs-client-xlators', 'onedata2102-glusterfs-api'])
+
 # validate onedatafs Python3 package installation
 check_call(['scl', 'enable', 'onedata{release}'.format(release='2102'), 'PYTHONPATH="${ONEDATA_PYTHON3_PATH}" python3 -c "from fs.onedatafs import OnedataFS"'])
 

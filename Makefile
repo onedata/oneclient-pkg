@@ -11,8 +11,8 @@ DOCKER_RELEASE        ?= development
 DOCKER_REG_NAME       ?= "docker.onedata.org"
 DOCKER_REG_USER       ?= ""
 DOCKER_REG_PASSWORD   ?= ""
-DOCKER_BASE_IMAGE     ?= "ubuntu:18.04"
-DOCKER_DEV_BASE_IMAGE ?= "onedata/worker:2102-6"
+DOCKER_BASE_IMAGE     ?= "ubuntu:20.04"
+DOCKER_DEV_BASE_IMAGE ?= "onedata/worker:2102-8"
 
 ifeq ($(strip $(ONECLIENT_VERSION)),)
 ONECLIENT_VERSION       := $(shell git -C oneclient describe --tags --always --abbrev=7)
@@ -74,7 +74,7 @@ mv_rpm = mv $(1)/package/packages/*.src.rpm package/$(DISTRIBUTION)/SRPMS && \
 	mv $(1)/package/packages/*.x86_64.rpm package/$(DISTRIBUTION)/x86_64
 mv_noarch_rpm = mv $(1)/package/packages/*.src.rpm package/$(DISTRIBUTION)/SRPMS && \
 	mv $(1)/package/packages/*.noarch.rpm package/$(DISTRIBUTION)/x86_64
-make_deb = $(call make, $(1)) -e DISTRIBUTION=$(DISTRIBUTION) --privileged --group sbuild -i onedata/deb_builder:$(DISTRIBUTION)-$(RELEASE)$(PKG_BUILDER_VERSION) $(2)
+make_deb = $(call make, $(1)) -e DISTRIBUTION=$(DISTRIBUTION) --privileged --grant-sudo-rights --group sbuild -i onedata/deb_builder:$(DISTRIBUTION)-$(RELEASE)$(PKG_BUILDER_VERSION) $(2)
 mv_deb = mv $(1)/package/packages/*_amd64.deb package/$(DISTRIBUTION)/binary-amd64 && \
 	mv $(1)/package/packages/*.tar.gz package/$(DISTRIBUTION)/source | true && \
 	mv $(1)/package/packages/*.dsc package/$(DISTRIBUTION)/source | true && \
@@ -111,7 +111,7 @@ submodules:
 ## Build
 ##
 
-build: build_oneclient 
+build: build_oneclient
 
 build_oneclient: submodules
 	$(call make, oneclient) deb-info
@@ -120,7 +120,7 @@ build_oneclient: submodules
 ## Artifacts
 ##
 
-artifact:  artifact_oneclient 
+artifact:  artifact_oneclient
 
 artifact_oneclient:
 	$(call unpack, oneclient)
