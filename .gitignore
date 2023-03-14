@@ -9,8 +9,8 @@ test-reports/*
 tests/**/.cache
 
 package
-docker-build-list.json
-docker-build-report.txt
+docker-*-list.json
+docker-*-report.txt
 
 # OSX
 .DS_Store

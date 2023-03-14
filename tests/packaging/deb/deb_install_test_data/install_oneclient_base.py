@@ -27,6 +27,9 @@ check_call(['sh', '-c', 'apt -y install /root/pkg/{package}'.format(package=oned
 # validate oneclient package installation
 check_call(['/usr/bin/oneclient', '--help'])
 
+# validate oneclient package installation
+check_call(['/usr/bin/ones3', '--help'])
+
 # validate onedatafs Python3 package installation
 check_call(['python3', '-c', 'from onedatafs import OnedataFS'])
 

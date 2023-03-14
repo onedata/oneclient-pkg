@@ -20,7 +20,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get -y update && \
     apt-get -y install bash-completion ca-certificates curl iputils-ping netcat \
                        man-db net-tools traceroute vim python3-xattr \
-                       parallel python3-pip gnupg2 xattr pv bsdmainutils && \
+                       parallel python3-pip gnupg2 xattr pv bsdmainutils \
+                       nload htop && \
     apt-get clean
 
 # Install fs.onedatafs dependencies
@@ -51,23 +52,4 @@ RUN mv /tmp/excludes.bak /etc/dpkg/dpkg.cfg.d/excludes
 # Enable autocompletion
 RUN echo "source /etc/bash_completion" >> /root/.bashrc
 
-# Install Samba and NFS servers
-RUN apt-get -y install samba rpcbind nfs-kernel-server && \
-    apt-get clean
 
-# Add Samba and NFS configs
-ADD nfs_exports /etc/exports
-ADD smb.conf /etc/samba/
-
-# Add entrypoint script
-ADD run.sh /root/run.sh
-
-VOLUME /root/.local/share/oneclient /mnt/oneclient
-
-ENV ONECLIENT_INSECURE=1
-
-# Disable http_proxy for normal operation
-ENV http_proxy ""
-
-ENTRYPOINT ["/root/run.sh"]
-CMD ["/mnt/oneclient"]
