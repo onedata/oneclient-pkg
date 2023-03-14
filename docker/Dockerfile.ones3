@@ -1,0 +1,71 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+MAINTAINER Bartek Kryza <bkryza@gmail.com>
+
+RUN apt-get -y update && \
+    apt-get -y install unzip wget && \
+    apt-get clean
+
+
+# Install awscli
+RUN cd /tmp && \
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install && \
+    mkdir -p /root/.aws && \
+    rm -rf /tmp/aws
+
+# Install rclone
+RUN cd /tmp && \
+    curl -O https://downloads.rclone.org/rclone-current-linux-amd64.zip && \
+    unzip rclone-current-linux-amd64.zip && \
+    cd rclone-*-linux-amd64 && \
+    cp rclone /usr/bin/ && \
+    chown root:root /usr/bin/rclone && \
+    chmod 755 /usr/bin/rclone && \
+    mkdir -p /root/.config/rclone && \
+    cd /tmp && \
+    rm -rf rclone-*
+
+# Install minio client
+RUN cd /tmp && \
+    wget https://dl.min.io/client/mc/release/linux-amd64/mc && \
+    cp mc /usr/bin/mc && \
+    chown root:root /usr/bin/mc && \
+    chmod 755 /usr/bin/mc && \
+    mkdir -p /root/.mc && \
+    rm /tmp/mc
+
+# Install minio warp benchmark
+RUN cd /tmp && \
+    wget https://github.com/minio/warp/releases/download/v0.5.5/warp_0.5.5_Linux_x86_64.deb && \
+    apt install ./warp_0.5.5_Linux_x86_64.deb && \
+    rm /tmp/warp_0.5.5_Linux_x86_64.deb
+
+# Install s3-benchmark
+RUN cd /tmp && \
+    curl -OL https://github.com/dvassallo/s3-benchmark/raw/master/build/linux-amd64/s3-benchmark && \
+    cp s3-benchmark /usr/bin/s3-benchmark && \
+    chown root:root /usr/bin/s3-benchmark && \
+    chmod 755 /usr/bin/s3-benchmark
+
+# Add s3 setup script
+ADD add-s3-profile /usr/bin/add-s3-profile
+RUN chmod +x /usr/bin/add-s3-profile
+
+
+RUN mkdir /etc/ones3
+
+VOLUME /etc/ones3
+
+# Add entrypoint script
+ADD run-ones3.sh /root/run.sh
+RUN chmod +x /root/run.sh
+
+ENV ONECLIENT_INSECURE=1
+
+# Disable http_proxy for normal operation
+ENV http_proxy ""
+
+ENTRYPOINT ["/root/run.sh"]
+CMD ["-c", "/etc/ones3/ones3.conf"]

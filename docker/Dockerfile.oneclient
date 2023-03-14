@@ -1,0 +1,17 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+MAINTAINER Bartek Kryza <bkryza@gmail.com>
+
+# Add entrypoint script
+ADD run-oneclient.sh /root/run.sh
+RUN chmod +x /root/run.sh
+
+VOLUME /root/.local/share/oneclient /mnt/oneclient
+
+ENV ONECLIENT_INSECURE=1
+
+# Disable http_proxy for normal operation
+ENV http_proxy ""
+
+ENTRYPOINT ["/root/run.sh"]
+CMD ["/mnt/oneclient"]

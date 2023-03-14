@@ -1,0 +1,113 @@
+#!/usr/bin/python3
+
+import configparser
+import argparse
+import json
+import os
+from os.path import exists
+
+def add_rclone_profile(name, endpoint, access_key, secret_key):
+    """
+    Adds or updates existing rclone profile identified by `name`
+    """
+
+    config_path = "/root/.config/rclone/rclone.conf"
+
+    config = configparser.ConfigParser()
+    if exists(config_path):
+        config.read(config_path)
+
+    if name not in config:
+        config[name] = {}
+
+    config[name]["type"] = "s3"
+    config[name]["access_key_id"] = access_key
+    config[name]["secret_access_key"] = secret_key
+    config[name]["endpoint"] = endpoint
+
+    if "provider" not in config[name]:
+        config[name]["provider"] = "Other"
+    if "env_auth" not in config[name]:
+        config[name]["env_auth"] = "false"
+    if "location_constraint" not in config[name]:
+        config[name]["location_constraint"] = "us-east-1"
+    if "acl" not in config[name]:
+        config[name]["acl"] = "private"
+    if "bucket_acl" not in config[name]:
+        config[name]["bucket_acl"] = "private"
+    if "upload_cutoff" not in config[name]:
+        config[name]["upload_cutoff"] = "20M"
+    if "chunk_size" not in config[name]:
+        config[name]["chunk_size"] = "16M"
+    if "multi-thread-streams" not in config[name]:
+        config[name]["multi-thread-streams"] = "20"
+
+    with open(config_path, 'w') as configfile:
+        config.write(configfile)
+
+
+def add_awscli_profile(name, endpoint, access_key, secret_key):
+    """
+    Adds or updates existing awscli profile identified by `name`
+    """
+
+    os.system(f'aws configure set aws_access_key_id {access_key} --profile {name}')
+    os.system(f'aws configure set aws_secret_access_key {secret_key} --profile {name}')
+
+    os.system(f'echo \\# AWS variables for S3 profile "{name}" >> ~/.zshrc')
+    os.system(f'echo export AWS_ACCESS_KEY_ID={access_key} >> ~/.zshrc')
+    os.system(f'echo export AWS_SECRET_ACCESS_KEY={secret_key} >> ~/.zshrc')
+    os.system(f'echo export AWS_S3_ENDPOINT={endpoint} >> ~/.zshrc')
+
+
+def add_minio_profile(name, endpoint, access_key, secret_key):
+    """
+    Adds or updates existing minio profile identified by `name`
+    """
+
+    os.system(f'mc alias set --insecure --quiet {name} {endpoint} {access_key} {secret_key}')
+
+
+def add_s3fs_profile(name, endpoint, access_key, secret_key):
+    """
+    Adds or updates existing minio profile identified by `name`
+    """
+
+    os.system(f'echo {access_key}:{secret_key} > /etc/passwd-s3fs')
+    os.system(f'chmod 600 /etc/passwd-s3fs')
+
+
+def add_warp_profile(name, endpoint, access_key, secret_key):
+    """
+    Adds or updates existing minio profile identified by `name`
+    """
+
+    os.system(f'echo \\# Minio Warp variables for S3 profile "{name}" >> ~/.zshrc')
+    os.system(f'echo export WARP_HOST={endpoint} >> ~/.zshrc')
+    os.system(f'echo export WARP_ACCESS_KEY={access_key} >> ~/.zshrc')
+    os.system(f'echo export WARP_SECRET_KEY={secret_key} >> ~/.zshrc')
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Add or update S3 client profiles (awscli, rclone, minio).')
+    parser.add_argument('--name', type=str,
+            help='profile name (e.g. my-s3-profile)')
+    parser.add_argument('--endpoint', type=str,
+            help='S3 server endpoint (e.g. https://127.0.0.1:8080)')
+    parser.add_argument('--access-key', type=str,
+            help='S3 access key id (e.g. ASDLKJCHHDFLKJASDESDF)')
+    parser.add_argument('--secret-key', type=str,
+            help='S3 secret key (e.g. NMBASDFOUOEFBASDDDIOFLWBNBEXZJJDSFG)')
+
+    args = parser.parse_args()
+
+    add_rclone_profile(args.name, args.endpoint, args.access_key, args.secret_key)
+    add_awscli_profile(args.name, args.endpoint, args.access_key, args.secret_key)
+    add_minio_profile(args.name, args.endpoint, args.access_key, args.secret_key)
+    add_s3fs_profile(args.name, args.endpoint, args.access_key, args.secret_key)
+    add_warp_profile(args.name, args.endpoint, args.access_key, args.secret_key)
+
+
+if __name__ == '__main__':
+    main()
+
