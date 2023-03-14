@@ -168,54 +168,6 @@ Build fs-onedatafs CentOS package:
   - onedata
   - onedata-pkg-builder
   artifact-subscriptions: []
-# Build oneclient-base and onedatafs Xenial packages:
-#   key: BOX
-#   other:
-#     clean-working-dir: true
-#     all-other-apps:
-#       custom:
-#         auto: {}
-#         clover:
-#           useLocalLicenseKey: 'true'
-#         buildHangingConfig.enabled: 'false'
-#   tasks:
-#   - checkout:
-#       force-clean-build: 'true'
-#       description: Checkout Default Repository
-#   - script:
-#       interpreter: BINSH_OR_CMDEXE
-#       scripts:
-#       - |-
-#         # initialize submodules to get default packages versions
-#         git remote set-url origin ${bamboo.repository.git.repositoryUrl}
-#         git remote -v
-#         make submodules
-
-#         DISTRIBUTION=xenial \
-#         ONECLIENT_VERSION=$bamboo_ONECLIENT_VERSION \
-#         make deb_oneclient_base
-#       description: Build Oneclient Base and OnedataFS Xenial
-#   - script:
-#       interpreter: BINSH_OR_CMDEXE
-#       scripts:
-#       - tar -chzf xenial-oneclient-base.tar.gz package
-#       description: Package
-#   final-tasks:
-#   - script:
-#       interpreter: BINSH_OR_CMDEXE
-#       scripts:
-#       - curl ${bamboo.OnedataFinalTasksURL} | bash -
-#       description: Clear env
-#   artifacts:
-#   - name: xenial-oneclient-base.tar.gz
-#     pattern: xenial-oneclient-base.tar.gz
-#     shared: true
-#     required: false
-#   requirements:
-#   - system.docker.executable
-#   - onedata
-#   - onedata-pkg-builder
-#   artifact-subscriptions: []
 Build onedatafs-jupyter CentOS package:
   key: BOCP
   other:
@@ -265,54 +217,6 @@ Build onedatafs-jupyter CentOS package:
   - onedata
   - onedata-pkg-builder
   artifact-subscriptions: []
-# Build fs-onedatafs Xenial package:
-#   key: BFXP
-#   other:
-#     clean-working-dir: true
-#     all-other-apps:
-#       custom:
-#         auto: {}
-#         clover:
-#           useLocalLicenseKey: 'true'
-#         buildHangingConfig.enabled: 'false'
-#   tasks:
-#   - checkout:
-#       force-clean-build: 'true'
-#       description: Checkout Default Repository
-#   - script:
-#       interpreter: BINSH_OR_CMDEXE
-#       scripts:
-#       - |-
-#         # initialize submodules to get default packages versions
-#         git remote set-url origin ${bamboo.repository.git.repositoryUrl}
-#         git remote -v
-#         make submodules
-
-#         DISTRIBUTION=xenial \
-#         ONECLIENT_VERSION=$bamboo_ONECLIENT_VERSION \
-#         make deb_fsonedatafs
-#       description: Build fs-onedatafs Xenial
-#   - script:
-#       interpreter: BINSH_OR_CMDEXE
-#       scripts:
-#       - tar -chzf xenial-fsonedatafs.tar.gz package
-#       description: Package
-#   final-tasks:
-#   - script:
-#       interpreter: BINSH_OR_CMDEXE
-#       scripts:
-#       - curl ${bamboo.OnedataFinalTasksURL} | bash -
-#       description: Clear env
-#   artifacts:
-#   - name: xenial-fsonedatafs.tar.gz
-#     pattern: xenial-fsonedatafs.tar.gz
-#     shared: true
-#     required: false
-#   requirements:
-#   - system.docker.executable
-#   - onedata
-#   - onedata-pkg-builder
-#   artifact-subscriptions: []
 Build onedatafs-jupyter Focal package:
   key: BOBP
   other:
@@ -361,54 +265,6 @@ Build onedatafs-jupyter Focal package:
   - onedata
   - onedata-pkg-builder
   artifact-subscriptions: []
-# Build onedatafs-jupyter Xenial package:
-#   key: BOXP
-#   other:
-#     clean-working-dir: true
-#     all-other-apps:
-#       custom:
-#         auto: {}
-#         clover:
-#           useLocalLicenseKey: 'true'
-#         buildHangingConfig.enabled: 'false'
-#   tasks:
-#   - checkout:
-#       force-clean-build: 'true'
-#       description: Checkout Default Repository
-#   - script:
-#       interpreter: BINSH_OR_CMDEXE
-#       scripts:
-#       - |-
-#         # initialize submodules to get default packages versions
-#         git remote set-url origin ${bamboo.repository.git.repositoryUrl}
-#         git remote -v
-#         make submodules
-
-#         DISTRIBUTION=xenial \
-#         ONECLIENT_VERSION=$bamboo_ONECLIENT_VERSION \
-#         make deb_onedatafs_jupyter
-#       description: Build fs-onedatafs Xenial
-#   - script:
-#       interpreter: BINSH_OR_CMDEXE
-#       scripts:
-#       - tar -chzf xenial-onedatafs-jupyter.tar.gz package
-#       description: Package
-#   final-tasks:
-#   - script:
-#       interpreter: BINSH_OR_CMDEXE
-#       scripts:
-#       - curl ${bamboo.OnedataFinalTasksURL} | bash -
-#       description: Clear env
-#   artifacts:
-#   - name: xenial-onedatafs-jupyter.tar.gz
-#     pattern: xenial-onedatafs-jupyter.tar.gz
-#     shared: true
-#     required: false
-#   requirements:
-#   - system.docker.executable
-#   - onedata
-#   - onedata-pkg-builder
-#   artifact-subscriptions: []
 Build oneclient-base and onedatafs Focal packages:
   key: BOOBP
   other:
@@ -764,40 +620,6 @@ Oneclient Ubuntu Xenial:
   - onedata
   artifact-subscriptions:
   - artifact: oneclient-bin.tar.gz
-# Oneclient Fedora23:
-#   key: OF
-#   tasks:
-#   - checkout:
-#       force-clean-build: 'true'
-#       description: Checkout Default Repository
-#   - script:
-#       interpreter: BINSH_OR_CMDEXE
-#       scripts:
-#       - "set -e \n\nmake submodule=bamboos submodules\nmake submodule=oneclient submodules\n\nmkdir oneclient/package_fpm\nmv oneclient-bin.tar.gz oneclient/package_fpm/oneclient-bin.tar.gz"
-#       description: Build modules
-#   - script:
-#       interpreter: BINSH_OR_CMDEXE
-#       scripts:
-#       - |-
-#         set -e
-
-#         make DISTRIBUTION=fedora-23-x86_64 oneclient_rpm
-#       description: Build Oneclient Fedora 23 package
-#   - script:
-#       interpreter: BINSH_OR_CMDEXE
-#       scripts:
-#       - tar -chzf fedora23-oneclient.tar.gz package
-#       description: Package
-#   artifacts:
-#   - name: fedora23-oneclient.tar.gz
-#     pattern: fedora23-oneclient.tar.gz
-#     shared: true
-#     required: false
-#   requirements:
-#   - system.docker.executable
-#   - onedata
-#   artifact-subscriptions:
-#   - artifact: oneclient-bin.tar.gz
 Oneclient Ubuntu Focal:
   key: OUF
   description: Build Oneclient Ubuntu Focal package
@@ -938,7 +760,7 @@ Oneclient CentOS7:
       interpreter: BINSH_OR_CMDEXE
       scripts:
       - |-
-        set -e 
+        set -e
 
         git remote set-url origin ${bamboo.repository.git.repositoryUrl}
         git remote -v
@@ -981,7 +803,7 @@ Oneclient Ubuntu Jammy:
       interpreter: BINSH_OR_CMDEXE
       scripts:
       - |-
-        set -e 
+        set -e
         git remote set-url origin ${bamboo.repository.git.repositoryUrl}
         git remote -v
         make submodule=bamboos submodules
@@ -1103,11 +925,11 @@ Publish Oneclient packages:
           ./pkg.py --host docker_packages_devel --release $RELEASE push xenial-oneclient.tar.gz
           mv pkg-list.json xenial-oneclient-pkg-list.json
           ./pkg.py --host docker_packages_devel --release $RELEASE push bionic-oneclient.tar.gz
-          mv pkg-list.json bionic-oneclient-pkg-list.json    
+          mv pkg-list.json bionic-oneclient-pkg-list.json
           ./pkg.py --host docker_packages_devel --release $RELEASE push focal-oneclient.tar.gz
-          mv pkg-list.json focal-oneclient-pkg-list.json        
+          mv pkg-list.json focal-oneclient-pkg-list.json
           ./pkg.py --host docker_packages_devel --release $RELEASE push jammy-oneclient.tar.gz
-          mv pkg-list.json jammy-oneclient-pkg-list.json        
+          mv pkg-list.json jammy-oneclient-pkg-list.json
         else
           ./pkg.py --host docker_packages_devel push centos7-oneclient.tar.gz
           mv pkg-list.json centos7-oneclient-pkg-list.json
@@ -1158,92 +980,6 @@ Publish Oneclient packages:
   - artifact: bionic-oneclient.tar.gz
   - artifact: focal-oneclient.tar.gz
   - artifact: jammy-oneclient.tar.gz
-# Publish OnedataFS Jupyter docker:
-#   key: POJD
-#   other:
-#     clean-working-dir: true
-#     all-other-apps:
-#       custom:
-#         auto: {}
-#         clover:
-#           useLocalLicenseKey: 'true'
-#         buildHangingConfig.enabled: 'false'
-#   tasks:
-#   - checkout:
-#       force-clean-build: 'false'
-#       description: Checkout Default Repository
-#   - script:
-#       interpreter: BINSH_OR_CMDEXE
-#       scripts:
-#       - |-
-#         # initialize submodules to get default packages versions
-#         git remote set-url origin ${bamboo.repository.git.repositoryUrl}
-#         git remote -v
-#         make submodules
-
-#         ONECLIENT_VERSION=$bamboo_ONECLIENT_VERSION \
-#         make docker_onedatafs_jupyter
-#       description: Publish Oneclient docker
-#   - script:
-#       interpreter: BINSH_OR_CMDEXE
-#       scripts:
-#       - |-
-#         mkdir onedatafs_jupyter_images
-#         ls -l
-#         ls -l onedatafs-jupyter
-
-#         cp onedatafs-jupyter/docker-build-list.json onedatafs_jupyter_images/onedatafs-jupyter-docker-build-list.json
-
-#         tar -czf onedatafs_jupyter_docker_build.tar.gz onedatafs_jupyter_images/
-#       description: Package
-#   - script:
-#       interpreter: BINSH_OR_CMDEXE
-#       scripts:
-#       - |-
-#         ./bamboos/artifacts/push_artifact.py --hostname ${bamboo.artifactRepoHostname} --port ${bamboo.artifactRepoPort} \
-#             --username ${bamboo.artifactRepoUsername} --branch ${bamboo.planRepository.branchName} --plan onedatafs_jupyter_docker_build \
-#             --artifact onedatafs_jupyter_docker_build.tar.gz
-#       description: Push artifact
-#   final-tasks:
-#   - script:
-#       interpreter: BINSH_OR_CMDEXE
-#       scripts:
-#       - curl ${bamboo.OnedataFinalTasksURL} | bash -
-#       description: Clear env
-#   artifacts:
-#   - name: oc-docker-build-report.txt
-#     location: oneclient
-#     pattern: docker-build-report.txt
-#     shared: false
-#     required: false
-#   - name: oc-docker-build-list.json
-#     location: oneclient
-#     pattern: docker-build-list.json
-#     shared: false
-#     required: false
-#   - name: oc-docker-dev-build-list.json
-#     location: oneclient
-#     pattern: docker-dev-build-list.json
-#     shared: false
-#     required: false
-#   - name: oc-docker-dev-build-report.txt
-#     location: oneclient
-#     pattern: docker-dev-build-report.txt
-#     shared: false
-#     required: false
-#   - name: onedatafs-jupyter-docker-build-list.json
-#     location: onedatafs-jupyter
-#     pattern: docker-build-list.json
-#     shared: true
-#     required: false
-#   - name: onedatafs-jupyter-docker-build-report.txt
-#     location: onedatafs-jupyter
-#     pattern: docker-build-report.txt
-#     shared: true
-#     required: false
-#   requirements:
-#   - onedata
-#   artifact-subscriptions: []
 Publish Oneclient docker:
   key: POD
   other:
@@ -1267,9 +1003,8 @@ Publish Oneclient docker:
         git remote -v
         make submodules
 
-        ONECLIENT_VERSION=$bamboo_ONECLIENT_VERSION \
-        make docker_oneclient
-      description: Publish Oneclient docker
+        ONECLIENT_VERSION=$bamboo_ONECLIENT_VERSION make oneclient_dockers
+      description: Publish Oneclient and OneS3 dockers
   - script:
       interpreter: BINSH_OR_CMDEXE
       scripts:
@@ -1278,9 +1013,11 @@ Publish Oneclient docker:
         ls -l
         ls -l oneclient
         cp oneclient/docker-build-list.json oneclient_images/oc-docker-build-list.json
+        cp oneclient/docker-ones3-build-list.json oneclient_images/os3-docker-build-list.json
         cp oneclient/docker-dev-build-list.json oneclient_images/oc-docker-dev-build-list.json
+        cp oneclient/docker-dev-ones3-build-list.json oneclient_images/os3-docker-dev-build-list.json
         tar -czf oneclient_docker_build.tar.gz oneclient_images/
-      description: Package
+      description: Package Oneclient and OneS3 docker image build reports
   - script:
       interpreter: BINSH_OR_CMDEXE
       scripts:
@@ -1310,6 +1047,22 @@ Publish Oneclient docker:
     required: false
   - name: oc-docker-dev-build-report.txt
     pattern: docker-dev-build-report.txt
+    shared: true
+    required: false
+  - name: os3-docker-build-list.json
+    pattern: docker-ones3-build-list.json
+    shared: true
+    required: false
+  - name: os3-docker-build-report.txt
+    pattern: docker-ones3-build-report.txt
+    shared: true
+    required: false
+  - name: os3-docker-dev-build-list.json
+    pattern: docker-dev-ones3-build-list.json
+    shared: true
+    required: false
+  - name: os3-docker-dev-build-report.txt
+    pattern: docker-dev-ones3-build-report.txt
     shared: true
     required: false
   requirements:
