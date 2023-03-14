@@ -319,7 +319,7 @@ docker_dev_oneclient: docker_dev_common
                       --name oneclient-dev --publish --remove docker -f docker/Dockerfile.oneclient
 
 .PHONY: docker_dev_ones3
-docker_dev_ones3:
+docker_dev_ones3: docker_dev_common
 	./docker_build.py --repository $(DOCKER_REG_NAME) \
                       --user $(DOCKER_REG_USER) \
                       --password $(DOCKER_REG_PASSWORD) \
