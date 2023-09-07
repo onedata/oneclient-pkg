@@ -1100,7 +1100,6 @@ dependencies:
   - ODSRV-UP
   - ODSRV-OAP
   - ODSRV-MAOPT
-  - ODSRV-SP
 other:
   concurrent-build-plugin: system-default
 ---
