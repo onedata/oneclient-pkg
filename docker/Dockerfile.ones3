@@ -9,7 +9,6 @@ ARG VERSION=""
 ARG DISTRIBUTION="focal"
 ARG ONES3_PACKAGE="ones3"
 ARG HTTP_PROXY
-ARG PYFILESYSTEM_VERSION="2.4.14"
 
 # Enable Onedata devel package proxy cache
 ENV http_proxy ${HTTP_PROXY}
@@ -18,7 +17,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Get the image up to date and install utility tools
 RUN apt-get -y update && \
     apt-get -y install bash-completion ca-certificates curl iputils-ping netcat \
-                       man-db net-tools traceroute nload htop unzip wget && \
+                       man-db net-tools traceroute nload htop unzip wget gnupg2 && \
     apt-get clean
 
 WORKDIR /tmp

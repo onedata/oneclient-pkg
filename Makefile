@@ -265,9 +265,8 @@ docker_ones3:
                       --build-arg RELEASE_TYPE=$(DOCKER_RELEASE) \
                       --build-arg RELEASE=$(RELEASE) \
                       --build-arg VERSION=$(ONECLIENT_VERSION) \
-                      --build-arg FSONEDATAFS_VERSION=$(FSONEDATAFS_VERSION) \
                       --build-arg HTTP_PROXY=$(HTTP_PROXY) \
-                      --build-arg ONECLIENT_PACKAGE=oneclient \
+                      --build-arg ONES3_PACKAGE=ones3 \
                       --report docker-ones3-build-report.txt \
                       --short-report docker-ones3-build-list.json \
                       --name ones3 --publish --remove docker -f docker/Dockerfile.ones3
@@ -295,9 +294,8 @@ docker_dev_ones3:
                       --build-arg BASE_IMAGE=$(DOCKER_DEV_BASE_IMAGE) \
                       --build-arg RELEASE=$(RELEASE) \
                       --build-arg VERSION=$(ONECLIENT_VERSION) \
-                      --build-arg FSONEDATAFS_VERSION=$(FSONEDATAFS_VERSION) \
                       --build-arg HTTP_PROXY=$(HTTP_PROXY) \
-                      --build-arg ONECLIENT_PACKAGE=oneclient \
+                      --build-arg ONES3_PACKAGE=ones3 \
                       --report docker-dev-ones3-build-report.txt \
                       --short-report docker-dev-ones3-build-list.json \
                       --name ones3-dev --publish --remove docker -f docker/Dockerfile.ones3
