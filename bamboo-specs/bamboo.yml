@@ -48,7 +48,6 @@ stages:
     final: false
     jobs:
     - Oneclient Ubuntu Xenial
-    # - Oneclient Fedora23
     - Oneclient Ubuntu Focal
     - Oneclient Ubuntu Trusty
     - Oneclient Ubuntu Bionic
@@ -69,7 +68,6 @@ stages:
     manual: false
     final: false
     jobs:
-    # - Publish OnedataFS Jupyter docker
     - Publish Oneclient docker
 Build fs-onedatafs Focal package:
   key: BFBP
@@ -567,11 +565,18 @@ Build oneclient archive:
         set -e
 
         make oneclient_tar
+
+        make ones3_tar
       description: Build Oneclient binary archive
   artifacts:
   - name: oneclient-bin.tar.gz
     location: oneclient/package_fpm
     pattern: oneclient-bin.tar.gz
+    shared: true
+    required: false
+  - name: ones3-bin.tar.gz
+    location: oneclient/package_fpm
+    pattern: ones3-bin.tar.gz
     shared: true
     required: false
   requirements:
@@ -622,7 +627,7 @@ Oneclient Ubuntu Xenial:
   - artifact: oneclient-bin.tar.gz
 Oneclient Ubuntu Focal:
   key: OUF
-  description: Build Oneclient Ubuntu Focal package
+  description: Build Oneclient and OneS3 Ubuntu Focal package
   tasks:
   - checkout:
       force-clean-build: 'true'
@@ -640,6 +645,7 @@ Oneclient Ubuntu Focal:
 
         mkdir oneclient/package_fpm
         mv oneclient-bin.tar.gz oneclient/package_fpm/oneclient-bin.tar.gz
+        mv ones3-bin.tar.gz oneclient/package_fpm/ones3-bin.tar.gz
       description: Build modules
   - script:
       interpreter: BINSH_OR_CMDEXE
@@ -648,6 +654,7 @@ Oneclient Ubuntu Focal:
         set -e
 
         make DISTRIBUTION=focal oneclient_deb
+        make DISTRIBUTION=focal ones3_deb
       description: Build Oneclient Focal package
   - script:
       interpreter: BINSH_OR_CMDEXE
@@ -664,6 +671,7 @@ Oneclient Ubuntu Focal:
   - onedata
   artifact-subscriptions:
   - artifact: oneclient-bin.tar.gz
+  - artifact: ones3-bin.tar.gz
 Oneclient Ubuntu Trusty:
   key: OUT
   tasks:

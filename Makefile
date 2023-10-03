@@ -240,8 +240,8 @@ docker_oneclient_base:
 # self contained package (oneclient) into /opt/oneclient prefix and
 # symlinked into /usr prefix.
 #
-.PHONY: docker_common
-docker_common:
+.PHONY: docker_oneclient
+docker_oneclient:
 	./docker_build.py --repository $(DOCKER_REG_NAME) \
 	                  --user $(DOCKER_REG_USER) \
                       --password $(DOCKER_REG_PASSWORD) \
@@ -252,32 +252,16 @@ docker_common:
                       --build-arg FSONEDATAFS_VERSION=$(FSONEDATAFS_VERSION) \
                       --build-arg HTTP_PROXY=$(HTTP_PROXY) \
                       --build-arg ONECLIENT_PACKAGE=oneclient \
-                      --report docker-common-build-report.txt \
-                      --short-report docker-common-build-list.json \
-                      --name oneclient-common docker --publish --remove -f docker/Dockerfile
-
-.PHONY: docker_oneclient
-docker_oneclient: docker_common
-	./docker_build.py --repository $(DOCKER_REG_NAME) \
-	                  --user $(DOCKER_REG_USER) \
-                      --password $(DOCKER_REG_PASSWORD) \
-                      --build-arg BASE_IMAGE=$(DOCKER_REG_NAME)/oneclient-common:$(ONECLIENT_BASE_IMAGE) \
-                      --build-arg RELEASE_TYPE=$(DOCKER_RELEASE) \
-                      --build-arg RELEASE=$(RELEASE) \
-                      --build-arg VERSION=$(ONECLIENT_VERSION) \
-                      --build-arg FSONEDATAFS_VERSION=$(FSONEDATAFS_VERSION) \
-                      --build-arg HTTP_PROXY=$(HTTP_PROXY) \
-                      --build-arg ONECLIENT_PACKAGE=oneclient \
                       --report docker-build-report.txt \
                       --short-report docker-build-list.json \
-                      --name oneclient --publish --remove docker -f docker/Dockerfile.oneclient
+                      --name oneclient --publish --remove docker -f docker/Dockerfile
 
 .PHONY: docker_ones3
-docker_ones3: docker_common
+docker_ones3:
 	./docker_build.py --repository $(DOCKER_REG_NAME) \
 	                  --user $(DOCKER_REG_USER) \
                       --password $(DOCKER_REG_PASSWORD) \
-                      --build-arg BASE_IMAGE=$(DOCKER_REG_NAME)/oneclient-common:$(ONECLIENT_BASE_IMAGE) \
+                      --build-arg BASE_IMAGE=$(DOCKER_BASE_IMAGE) \
                       --build-arg RELEASE_TYPE=$(DOCKER_RELEASE) \
                       --build-arg RELEASE=$(RELEASE) \
                       --build-arg VERSION=$(ONECLIENT_VERSION) \
@@ -288,8 +272,8 @@ docker_ones3: docker_common
                       --short-report docker-ones3-build-list.json \
                       --name ones3 --publish --remove docker -f docker/Dockerfile.ones3
 
-.PHONY: docker_dev_common
-docker_dev_common:
+.PHONY: docker_dev_oneclient
+docker_dev_oneclient:
 	./docker_build.py --repository $(DOCKER_REG_NAME) \
                       --user $(DOCKER_REG_USER) \
                       --password $(DOCKER_REG_PASSWORD) \
@@ -299,31 +283,16 @@ docker_dev_common:
                       --build-arg FSONEDATAFS_VERSION=$(FSONEDATAFS_VERSION) \
                       --build-arg HTTP_PROXY=$(HTTP_PROXY) \
                       --build-arg ONECLIENT_PACKAGE=oneclient \
-                      --report docker-dev-common-build-report.txt \
-                      --short-report docker-dev-common-build-list.json \
-                      --name oneclient-dev-common --publish --remove docker
-
-.PHONY: docker_dev_oneclient
-docker_dev_oneclient: docker_dev_common
-	./docker_build.py --repository $(DOCKER_REG_NAME) \
-                      --user $(DOCKER_REG_USER) \
-                      --password $(DOCKER_REG_PASSWORD) \
-                      --build-arg BASE_IMAGE=$(DOCKER_REG_NAME)/oneclient-dev-common:$(ONECLIENT_BASE_IMAGE) \
-                      --build-arg RELEASE=$(RELEASE) \
-                      --build-arg VERSION=$(ONECLIENT_VERSION) \
-                      --build-arg FSONEDATAFS_VERSION=$(FSONEDATAFS_VERSION) \
-                      --build-arg HTTP_PROXY=$(HTTP_PROXY) \
-                      --build-arg ONECLIENT_PACKAGE=oneclient \
                       --report docker-dev-build-report.txt \
                       --short-report docker-dev-build-list.json \
-                      --name oneclient-dev --publish --remove docker -f docker/Dockerfile.oneclient
+                      --name oneclient-dev --publish --remove docker -f docker/Dockerfile
 
 .PHONY: docker_dev_ones3
-docker_dev_ones3: docker_dev_common
+docker_dev_ones3:
 	./docker_build.py --repository $(DOCKER_REG_NAME) \
                       --user $(DOCKER_REG_USER) \
                       --password $(DOCKER_REG_PASSWORD) \
-                      --build-arg BASE_IMAGE=$(DOCKER_REG_NAME)/oneclient-dev-common:$(ONECLIENT_BASE_IMAGE) \
+                      --build-arg BASE_IMAGE=$(DOCKER_DEV_BASE_IMAGE) \
                       --build-arg RELEASE=$(RELEASE) \
                       --build-arg VERSION=$(ONECLIENT_VERSION) \
                       --build-arg FSONEDATAFS_VERSION=$(FSONEDATAFS_VERSION) \

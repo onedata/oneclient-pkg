@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-/opt/oneclient/bin/ones3 "$@"
+/opt/ones3/bin/ones3 "$@"

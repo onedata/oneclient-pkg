@@ -2,10 +2,43 @@ ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 MAINTAINER Bartek Kryza <bkryza@gmail.com>
 
+# Build arguments
+ARG RELEASE_TYPE
+ARG RELEASE="2102"
+ARG VERSION=""
+ARG DISTRIBUTION="focal"
+ARG ONES3_PACKAGE="ones3"
+ARG HTTP_PROXY
+ARG PYFILESYSTEM_VERSION="2.4.14"
+
+# Enable Onedata devel package proxy cache
+ENV http_proxy ${HTTP_PROXY}
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Get the image up to date and install utility tools
 RUN apt-get -y update && \
-    apt-get -y install unzip wget && \
+    apt-get -y install bash-completion ca-certificates curl iputils-ping netcat \
+                       man-db net-tools traceroute nload htop unzip wget && \
     apt-get clean
 
+WORKDIR /tmp
+
+# Temporarly disable dpkg path-exludes so that all Oneclient files are installed
+# including docs and manpages
+RUN mv /etc/dpkg/dpkg.cfg.d/excludes /tmp/excludes.bak
+
+# Install oneclient package
+RUN case ${RELEASE_TYPE} in \
+        production) \
+            curl -O http://packages.onedata.org/oneclient-${RELEASE}.sh; \
+            ;; \
+        *) \
+            curl -O http://packages.devel.onedata.org/oneclient-${RELEASE}.sh; \
+            ;; \
+        esac && \
+        sh oneclient-${RELEASE}.sh ${ONES3_PACKAGE}=${VERSION}-1~${DISTRIBUTION}
+
+RUN mv /tmp/excludes.bak /etc/dpkg/dpkg.cfg.d/excludes
 
 # Install awscli
 RUN cd /tmp && \

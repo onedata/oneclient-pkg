@@ -52,4 +52,16 @@ RUN mv /tmp/excludes.bak /etc/dpkg/dpkg.cfg.d/excludes
 # Enable autocompletion
 RUN echo "source /etc/bash_completion" >> /root/.bashrc
 
+# Add entrypoint script
+ADD run-oneclient.sh /root/run.sh
+RUN chmod +x /root/run.sh
 
+VOLUME /root/.local/share/oneclient /mnt/oneclient
+
+ENV ONECLIENT_INSECURE=1
+
+# Disable http_proxy for normal operation
+ENV http_proxy ""
+
+ENTRYPOINT ["/root/run.sh"]
+CMD ["/mnt/oneclient"]
