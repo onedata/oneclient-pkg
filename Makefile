@@ -374,6 +374,29 @@ oneclient_deb: oneclient/$(ONECLIENT_FPMPACKAGE_TMP)/oneclient-bin.tar.gz debdir
 	mv oneclient/$(ONECLIENT_FPMPACKAGE_TMP)/oneclient*.deb package/$(DISTRIBUTION)/binary-amd64
 
 #
+# Build self-contained OneS3 archive, by extracting all necessary files
+# from intermediate Oneclient Docker image (oneclient-base)
+#
+ones3_tar oneclient/$(ONECLIENT_FPMPACKAGE_TMP)/ones3-bin.tar.gz:
+	$(MAKE) -C oneclient ONECLIENT_BASE_IMAGE=$(ONECLIENT_BASE_IMAGE) ones3_tar
+
+#
+# Build production OneS3 RPM using FPM tool from self contained archive
+#
+ones3_rpm: oneclient/$(ONECLIENT_FPMPACKAGE_TMP)/ones3-bin.tar.gz rpmdirs
+	$(MAKE) -C oneclient DISTRIBUTION=$(DISTRIBUTION) ONECLIENT_VERSION=$(ONECLIENT_VERSION) \
+		ones3_rpm
+	mv oneclient/$(ONECLIENT_FPMPACKAGE_TMP)/ones3*.rpm package/$(DISTRIBUTION)/x86_64
+
+#
+# Build production OneS3 DEB using FPM tool from self-contained archive
+#
+ones3_deb: oneclient/$(ONECLIENT_FPMPACKAGE_TMP)/ones3-bin.tar.gz debdirs
+	$(MAKE) -C oneclient DISTRIBUTION=$(DISTRIBUTION) ONECLIENT_VERSION=$(ONECLIENT_VERSION) \
+		ones3_deb
+	mv oneclient/$(ONECLIENT_FPMPACKAGE_TMP)/ones3*.deb package/$(DISTRIBUTION)/binary-amd64
+
+#
 # Build and upload oneclient conda packages
 #
 oneclient_conda:
