@@ -224,15 +224,15 @@ package.tar.gz:
 .PHONY: docker_oneclient_base
 docker_oneclient_base:
 	./docker_build.py --repository $(DOCKER_REG_NAME) --user $(DOCKER_REG_USER) \
-                          --password $(DOCKER_REG_PASSWORD) \
-                          --build-arg BASE_IMAGE=$(DOCKER_BASE_IMAGE) \
-                          --build-arg RELEASE_TYPE=$(DOCKER_RELEASE) \
-                          --build-arg RELEASE=$(RELEASE) \
-                          --build-arg VERSION=$(ONECLIENT_VERSION) \
-                          --build-arg FSONEDATAFS_VERSION=$(FSONEDATAFS_VERSION) \
-                          --build-arg HTTP_PROXY=$(HTTP_PROXY) \
-                          --build-arg ONECLIENT_PACKAGE=oneclient-base \
-                          --name oneclient-base --publish --remove docker
+                      --password $(DOCKER_REG_PASSWORD) \
+                      --build-arg BASE_IMAGE=$(DOCKER_BASE_IMAGE) \
+                      --build-arg RELEASE_TYPE=$(DOCKER_RELEASE) \
+                      --build-arg RELEASE=$(RELEASE) \
+                      --build-arg VERSION=$(ONECLIENT_VERSION) \
+                      --build-arg FSONEDATAFS_VERSION=$(FSONEDATAFS_VERSION) \
+                      --build-arg HTTP_PROXY=$(HTTP_PROXY) \
+                      --build-arg ONECLIENT_PACKAGE=oneclient-base \
+                      --name oneclient-base --publish --remove docker -f docker/Dockerfile.oneclient
 
 
 #
