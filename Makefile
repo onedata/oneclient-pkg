@@ -254,7 +254,7 @@ docker_oneclient:
                       --build-arg ONECLIENT_PACKAGE=oneclient \
                       --report docker-build-report.txt \
                       --short-report docker-build-list.json \
-                      --name oneclient --publish --remove docker -f docker/Dockerfile
+                      --name oneclient --publish --remove docker -f docker/Dockerfile.oneclient
 
 .PHONY: docker_ones3
 docker_ones3:
@@ -284,7 +284,7 @@ docker_dev_oneclient:
                       --build-arg ONECLIENT_PACKAGE=oneclient \
                       --report docker-dev-build-report.txt \
                       --short-report docker-dev-build-list.json \
-                      --name oneclient-dev --publish --remove docker -f docker/Dockerfile
+                      --name oneclient-dev --publish --remove docker -f docker/Dockerfile.oneclient
 
 .PHONY: docker_dev_ones3
 docker_dev_ones3:
