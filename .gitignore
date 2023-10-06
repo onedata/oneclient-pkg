@@ -12,6 +12,8 @@ package
 docker-*-list.json
 docker-*-report.txt
 
+pkg-list.json
+
 # OSX
 .DS_Store
 

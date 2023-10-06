@@ -13,11 +13,8 @@ stages:
     jobs:
     - Build fs-onedatafs Focal package
     - Build fs-onedatafs CentOS package
-    # - Build oneclient-base and onedatafs Xenial packages
     - Build onedatafs-jupyter CentOS package
-    # - Build fs-onedatafs Xenial package
     - Build onedatafs-jupyter Focal package
-    # - Build onedatafs-jupyter Xenial package
     - Build oneclient-base and onedatafs Focal packages
     - Build oneclient-base and onedatafs CentOS packages
 - Test OnedataFS:
@@ -48,7 +45,6 @@ stages:
     final: false
     jobs:
     - Oneclient Ubuntu Xenial
-    # - Oneclient Fedora23
     - Oneclient Ubuntu Focal
     - Oneclient Ubuntu Trusty
     - Oneclient Ubuntu Bionic
@@ -69,7 +65,6 @@ stages:
     manual: false
     final: false
     jobs:
-    # - Publish OnedataFS Jupyter docker
     - Publish Oneclient docker
 Build fs-onedatafs Focal package:
   key: BFBP
@@ -567,11 +562,18 @@ Build oneclient archive:
         set -e
 
         make oneclient_tar
+
+        make ones3_tar
       description: Build Oneclient binary archive
   artifacts:
   - name: oneclient-bin.tar.gz
     location: oneclient/package_fpm
     pattern: oneclient-bin.tar.gz
+    shared: true
+    required: false
+  - name: ones3-bin.tar.gz
+    location: oneclient/package_fpm
+    pattern: ones3-bin.tar.gz
     shared: true
     required: false
   requirements:
@@ -596,6 +598,7 @@ Oneclient Ubuntu Xenial:
 
         mkdir oneclient/package_fpm
         mv oneclient-bin.tar.gz oneclient/package_fpm/oneclient-bin.tar.gz
+        mv ones3-bin.tar.gz oneclient/package_fpm/ones3-bin.tar.gz
       description: Build modules
   - script:
       interpreter: BINSH_OR_CMDEXE
@@ -604,6 +607,7 @@ Oneclient Ubuntu Xenial:
         set -e
 
         make DISTRIBUTION=xenial oneclient_deb
+        make DISTRIBUTION=xenial ones3_deb
       description: Build Oneclient Xenial package
   - script:
       interpreter: BINSH_OR_CMDEXE
@@ -620,9 +624,10 @@ Oneclient Ubuntu Xenial:
   - onedata
   artifact-subscriptions:
   - artifact: oneclient-bin.tar.gz
+  - artifact: ones3-bin.tar.gz
 Oneclient Ubuntu Focal:
   key: OUF
-  description: Build Oneclient Ubuntu Focal package
+  description: Build Oneclient and OneS3 Ubuntu Focal package
   tasks:
   - checkout:
       force-clean-build: 'true'
@@ -640,6 +645,7 @@ Oneclient Ubuntu Focal:
 
         mkdir oneclient/package_fpm
         mv oneclient-bin.tar.gz oneclient/package_fpm/oneclient-bin.tar.gz
+        mv ones3-bin.tar.gz oneclient/package_fpm/ones3-bin.tar.gz
       description: Build modules
   - script:
       interpreter: BINSH_OR_CMDEXE
@@ -648,6 +654,7 @@ Oneclient Ubuntu Focal:
         set -e
 
         make DISTRIBUTION=focal oneclient_deb
+        make DISTRIBUTION=focal ones3_deb
       description: Build Oneclient Focal package
   - script:
       interpreter: BINSH_OR_CMDEXE
@@ -664,6 +671,7 @@ Oneclient Ubuntu Focal:
   - onedata
   artifact-subscriptions:
   - artifact: oneclient-bin.tar.gz
+  - artifact: ones3-bin.tar.gz
 Oneclient Ubuntu Trusty:
   key: OUT
   tasks:
@@ -683,6 +691,7 @@ Oneclient Ubuntu Trusty:
 
         mkdir oneclient/package_fpm
         mv oneclient-bin.tar.gz oneclient/package_fpm/oneclient-bin.tar.gz
+        mv ones3-bin.tar.gz oneclient/package_fpm/ones3-bin.tar.gz
       description: Build modules
   - script:
       interpreter: BINSH_OR_CMDEXE
@@ -691,6 +700,7 @@ Oneclient Ubuntu Trusty:
         set -e
 
         make DISTRIBUTION=trusty oneclient_deb
+        make DISTRIBUTION=trusty ones3_deb
       description: Build Oneclient Ubuntu Trusty package
   - script:
       interpreter: BINSH_OR_CMDEXE
@@ -707,6 +717,7 @@ Oneclient Ubuntu Trusty:
   - onedata
   artifact-subscriptions:
   - artifact: oneclient-bin.tar.gz
+  - artifact: ones3-bin.tar.gz
 Oneclient Ubuntu Bionic:
   key: OUB
   tasks:
@@ -726,6 +737,7 @@ Oneclient Ubuntu Bionic:
 
         mkdir oneclient/package_fpm
         mv oneclient-bin.tar.gz oneclient/package_fpm/oneclient-bin.tar.gz
+        mv ones3-bin.tar.gz oneclient/package_fpm/ones3-bin.tar.gz
       description: Build modules
   - script:
       interpreter: BINSH_OR_CMDEXE
@@ -734,6 +746,7 @@ Oneclient Ubuntu Bionic:
         set -e
 
         make DISTRIBUTION=bionic oneclient_deb
+        make DISTRIBUTION=bionic ones3_deb
       description: Build Oneclient Xenial package
   - script:
       interpreter: BINSH_OR_CMDEXE
@@ -750,6 +763,7 @@ Oneclient Ubuntu Bionic:
   - onedata
   artifact-subscriptions:
   - artifact: oneclient-bin.tar.gz
+  - artifact: ones3-bin.tar.gz
 Oneclient CentOS7:
   key: OC
   tasks:
@@ -769,6 +783,7 @@ Oneclient CentOS7:
 
         mkdir oneclient/package_fpm
         mv oneclient-bin.tar.gz oneclient/package_fpm/oneclient-bin.tar.gz
+        mv ones3-bin.tar.gz oneclient/package_fpm/ones3-bin.tar.gz
       description: Build modules
   - script:
       interpreter: BINSH_OR_CMDEXE
@@ -777,6 +792,7 @@ Oneclient CentOS7:
         set -e
 
         make DISTRIBUTION=centos-7-x86_64 oneclient_rpm
+        make DISTRIBUTION=centos-7-x86_64 ones3_rpm
       description: Build Oneclient CentOS 7 package
   - script:
       interpreter: BINSH_OR_CMDEXE
@@ -793,6 +809,7 @@ Oneclient CentOS7:
   - onedata
   artifact-subscriptions:
   - artifact: oneclient-bin.tar.gz
+  - artifact: ones3-bin.tar.gz
 Oneclient Ubuntu Jammy:
   key: OUJ
   tasks:
@@ -810,6 +827,7 @@ Oneclient Ubuntu Jammy:
         make submodule=oneclient submodules
         mkdir oneclient/package_fpm
         mv oneclient-bin.tar.gz oneclient/package_fpm/oneclient-bin.tar.gz
+        mv ones3-bin.tar.gz oneclient/package_fpm/ones3-bin.tar.gz
       description: Build modules
   - script:
       interpreter: BINSH_OR_CMDEXE
@@ -817,6 +835,7 @@ Oneclient Ubuntu Jammy:
       - |-
         set -e
         make DISTRIBUTION=jammy oneclient_deb
+        make DISTRIBUTION=jammy ones3_deb
       description: Build Oneclient Jammy package
   - script:
       interpreter: BINSH_OR_CMDEXE
@@ -833,6 +852,7 @@ Oneclient Ubuntu Jammy:
   - onedata
   artifact-subscriptions:
   - artifact: oneclient-bin.tar.gz
+  - artifact: ones3-bin.tar.gz
 Test Oneclient packages:
   key: TOP
   other:
