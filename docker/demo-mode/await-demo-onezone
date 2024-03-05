@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source /root/demo-mode/demo-common.sh
+source /root/demo-mode/better-curl.sh
 
 ONEZONE_IP=$(getent hosts onezone.local | awk '{ print $1 }')
 

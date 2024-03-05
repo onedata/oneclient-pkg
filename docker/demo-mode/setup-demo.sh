@@ -17,9 +17,14 @@ if [[ ! ${ONEZONE_IP} =~ $IP_REGEX ]]; then
     exit 1
 fi
 
-ONECLIENT_IP=$(hostname -I | tr -d ' ')
-
-source /root/demo-mode/demo-common.sh
+if [[ ! -z "${ONEPROVIDER_IP}" ]]; then
+    if [[ ! ${ONEPROVIDER_IP} =~ $IP_REGEX ]]; then
+	echo "[ERROR] \"${ONEPROVIDER_IP}\" does not look like a valid IP address, exiting."
+	exit 1
+    fi
+fi
+    
+source /root/demo-mode/better-curl.sh
 
 main() {
     HOSTNAME=$(hostname)
@@ -30,18 +35,20 @@ main() {
     echo -e "\e[1;33m"
     echo "-------------------------------------------------------------------------"
     echo "Starting Oneclient in demo mode..."
+    echo "When the service is ready, an adequate log will appear here."
+    echo "You may also use the await script: \"docker exec \$CONTAINER_ID await-demo-oneclient\"."
     echo "-------------------------------------------------------------------------"
     echo -e "\e[0m"
 
     await-demo-onezone
-    if [ -z $2 ]; then
+    if [ -z $ONEPROVIDER_IP ]; then
 	# Get number of oneproviders and select randomly one 
 	OP_NUM=$(curl -v -k -u "admin:password" https://onezone.local/api/v3/onezone/providers |\
 		     jq '.providers | length')
 	while [[ ${OP_NUM} == 0 ]]; do
 	    sleep 2
 	    OP_NUM=$(curl -v -k -u "admin:password" https://onezone.local/api/v3/onezone/providers |\
-		     jq '.providers | length')
+			 jq '.providers | length')
 	    echo $OP_NUM
 	done
 	OP=$((RANDOM % $OP_NUM))
@@ -51,66 +58,31 @@ main() {
 	       https://onezone.local/api/v3/onezone/providers/${OP_ID} |\
 	       jq -r .domain)
     else
-	export ONECLIENT_PROVIDER_HOST=$2
+	export ONECLIENT_PROVIDER_HOST=$ONEPROVIDER_IP
     fi
-    
+    echo -e "\e[1;33m"
+    echo "-------------------------------------------------------------------------"
+    echo "Attempting connection to Oneprovider at IP: $ONECLIENT_PROVIDER_HOST"
+    echo "-------------------------------------------------------------------------"
+    echo -e "\e[0m"    
     # Get access token
-    if do_curl -k -u admin:password "https://onezone.local/api/v3/onezone/user/tokens/named/name/oneclient-access-token"; then 
-	echo Token exists already
-	export ONECLIENT_ACCESS_TOKEN=$(jq -r .token /tmp/curl-resp-body.txt)
-    else
-	echo Creating access token
-	export ONECLIENT_ACCESS_TOKEN=$(curl -k -u admin:password \
-		 "https://${ONEZONE_DOMAIN}/api/v3/onezone/user/tokens/named" \
-		 -X POST -H 'Content-type: application/json' -d '
-		 {	 
-                     "name": "oneclient-access-token",
-         	     "type": {"accessToken": {}}
-                 }' | jq -r .token )
-    fi
+    export ONECLIENT_ACCESS_TOKEN=$(demo-access-token)
     echo ONECLIENT_ACCESS_TOKEN=$ONECLIENT_ACCESS_TOKEN
+    await-supported-demo-space
 
-    # Wait for oneprovider readiness
-    RETRY_NUM=0
-    while ! curl -fk -H "x-auth-token:$ONECLIENT_ACCESS_TOKEN" -X POST \
-	    "https://${ONECLIENT_PROVIDER_HOST}/api/v3/oneprovider/lookup-file-id/demo-space" \
-	  &> /dev/null; do
-	RETRY_NUM=$((RETRY_NUM + 1))
+    # Wait asyncly for demo-space to appear in /mnt/oneclient
+    {
+	if ! await-demo-oneclient; then
+            exit_and_kill_docker
+        fi
 
-	if ! ((RETRY_NUM % 15)); then
-            echo -e "\e[1;33m"
-            echo "-------------------------------------------------------------------------"
-            echo "Awaiting for the demo environment to be set up..."
-            echo "-------------------------------------------------------------------------"
-            echo -e "\e[0m"
-	fi
-	
-	if [[ ${RETRY_NUM} -eq ${TIMEOUT} ]]; then
-            echo -e "\e[1;31m"
-            echo "-------------------------------------------------------------------------"
-            echo "ERROR: The demo environment failed to be set up within ${TIMEOUT} seconds, exiting."
-            echo "-------------------------------------------------------------------------"
-            echo -e "\e[0m"
-            exit 1
-	fi
-
-	sleep 1;
-    done
-    # while [ "${ONECLIENT_PROVIDER_ID}" = "" ]; do
-    #     ONECLIENT_PROVIDER_ID="$(curl -k https://${ONECLIENT_PROVIDER_HOST}/configuration 2>/dev/null | tr ',     ' '\n' | grep 'providerId' | tr -d '"' | cut -d ':' -f 2)";
-    #     if [ "$ONECLIENT_PROVIDER_ID" = "" ]; then
-    #         echo "[main process] Cannot obtain ONECLIENT_PROVIDER_ID=$ONECLIENT_PROVIDER_ID of Oneprovider host=$ONECLIENT_PROVIDER_HOST";
-    #         sleep 2;
-    #     fi;
-    # done;
-
-
-    # echo -e "\e[1;32m"
-    # echo "-------------------------------------------------------------------------"
-    # echo " Mounting in /mnt/oneclient on container 
-    # echo "-------------------------------------------------------------------------"
-    # echo -e "\e[0m"
-
+        echo -e "\e[1;32m"
+        echo "-------------------------------------------------------------------------"
+        echo "Oneclient is ready."
+	echo "The demo space is mounted under /mnt/oneclient in the container"
+        echo "-------------------------------------------------------------------------"
+        echo -e "\e[0m"
+    } &
 }
 
 main "$@"
