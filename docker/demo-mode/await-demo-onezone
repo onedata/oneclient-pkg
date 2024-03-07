@@ -25,7 +25,7 @@ while ! do_curl -u admin:password "https://${ONEZONE_DOMAIN}/api/v3/onezone/user
         echo "ERROR: The Onezone service (PROVIDER_IP = ${ONEZONE_IP}) failed to become ready within ${TIMEOUT} seconds, exiting."
         echo "-------------------------------------------------------------------------"
         echo -e "\e[0m"
-        exit 1
+        exit_and_kill_docker
     fi
 
     sleep 1;

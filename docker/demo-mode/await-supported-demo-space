@@ -1,12 +1,23 @@
 #!/bin/bash
 
+source /root/demo-mode/better-curl.sh
+
 # Wait for oneprovider readiness
+
+PROVIDER_HOST=$1
+if [[ -z $PROVIDER_HOST ]]; then
+    echo "ERROR: You must provide the Oneprovider host (e.g. 172.17.0.3) as the first argument."
+    exit_and_kill_docker
+fi
+
+# Optional second argument
+TIMEOUT=${2:-300}
+
+ACCESS_TOKEN=$(demo-access-token)
 RETRY_NUM=0
-# Optional first argument
-TIMEOUT=${1:-300}
-while ! curl -fk -H "x-auth-token:$ONECLIENT_ACCESS_TOKEN" -X POST \
-	"https://${ONECLIENT_PROVIDER_HOST}/api/v3/oneprovider/lookup-file-id/demo-space" \
-      &> /tmp/curl-out; do
+while ! do_curl -H "x-auth-token:$ACCESS_TOKEN" -X POST \
+        "https://${PROVIDER_HOST}/api/v3/oneprovider/lookup-file-id/demo-space" \
+      > /dev/null; do
     RETRY_NUM=$((RETRY_NUM + 1))
     
     if ! ((RETRY_NUM % 15)); then
@@ -23,7 +34,7 @@ while ! curl -fk -H "x-auth-token:$ONECLIENT_ACCESS_TOKEN" -X POST \
         echo "ERROR: The demo environment failed to be set up within ${TIMEOUT} seconds, exiting."
         echo "-------------------------------------------------------------------------"
         echo -e "\e[0m"
-        exit 1
+        exit_and_kill_docker
     fi
     
     sleep 1;
