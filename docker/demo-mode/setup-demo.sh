@@ -9,7 +9,6 @@ TIMEOUT=300
 # Regular expression to match IPv4 address
 IP_REGEX="^([0-9]{1,3}\.){3}[0-9]{1,3}$"
 
-
 if [[ -z "${ONEZONE_IP}" ]]; then
     echo "ERROR: You must provide Onezone IP address as the first argument of the demo command, exiting."
     exit_and_kill_docker
@@ -28,9 +27,9 @@ if [[ -n "${ONEPROVIDER_IP}" ]]; then
 fi
 
 list_providers() {
-    do_curl -u "admin:password" https://onezone.local/api/v3/onezone/providers
+    do_curl -u "admin:password" "https://${ONEZONE_DOMAIN}/api/v3/onezone/providers" | jq '.providers'
 }
-    
+
 main() {
     echo "${ONEZONE_IP} ${ONEZONE_DOMAIN}" >> /etc/hosts
 
@@ -42,53 +41,73 @@ main() {
     echo "-------------------------------------------------------------------------"
     echo -e "\e[0m"
 
-    await-demo-onezone
-    if [ -z $ONEPROVIDER_IP ]; then
-        # Get number of oneproviders and select randomly one 
-        OP_NUM=$(list_providers | jq '.providers | length')
+    if ! await-demo-onezone; then
+        exit_and_kill_docker
+    fi
+
+    if [[ -n "$ONEPROVIDER_IP" ]]; then
+        echo "-------------------------------------------------------------------------"
+        echo "Oneclient will connect to the user-specified Oneprovider at $ONEPROVIDER_IP."
+        echo "-------------------------------------------------------------------------"
+    else
+        # get the number of oneproviders and randomly select one
+        OP_COUNT=$(list_providers | jq 'length')
         RETRY_NUM=0
-        while [[ $OP_NUM == 0 ]]; do
+        while [[ $OP_COUNT == 0 ]]; do
             RETRY_NUM=$((RETRY_NUM + 1))
 
             if ! ((RETRY_NUM % 15)); then
                 echo -e "\e[1;33m"
                 echo "-------------------------------------------------------------------------"
-                echo "Awaiting for any Oneprovider service to be available......"
+                echo "Waiting for any Oneprovider service to be available..."
                 echo "-------------------------------------------------------------------------"
                 echo -e "\e[0m"
             fi
-            
+
             if [[ ${RETRY_NUM} -eq ${TIMEOUT} ]]; then
                 echo -e "\e[1;31m"
                 echo "-------------------------------------------------------------------------"
-                echo "ERROR: No Oneprovider service has become available within ${TIMEOUT} seconds." 
+                echo "ERROR: No Oneprovider service has become available within ${TIMEOUT} seconds."
                 echo "Exiting..."
                 echo "-------------------------------------------------------------------------"
                 echo -e "\e[0m"
                 exit_and_kill_docker
             fi
-            sleep 1
-            OP_NUM=$(list_providers | jq '.providers | length')
-        done
-        OP=$((RANDOM % $OP_NUM))
-        OP_ID=$(list_providers | jq -r .providers[$OP])
-        ONEPROVIDER_IP=$(do_curl -u "admin:password" \
-               https://onezone.local/api/v3/onezone/providers/${OP_ID} |\
-               jq -r .domain)
-    fi
-    # export envs that are required by the oneclient application
-    export ONECLIENT_PROVIDER_HOST=$ONEPROVIDER_IP
-    export ONECLIENT_ACCESS_TOKEN=$(demo-access-token)    
-    await-supported-demo-space $ONEPROVIDER_IP
-    echo -e "\e[1;33m"
-    echo "-------------------------------------------------------------------------"
-    echo "Mounting Oneclient with the following parameters:"
-    echo   ONECLIENT_PROVIDER_HOST=$ONECLIENT_PROVIDER_HOST
-    echo   ONECLIENT_ACCESS_TOKEN=$ONECLIENT_ACCESS_TOKEN
-    echo "-------------------------------------------------------------------------"
-    echo -e "\e[0m"    
 
-    # Wait asyncly for demo-space to appear in /mnt/oneclient
+            sleep 1
+            OP_COUNT=$(list_providers | jq 'length')
+        done
+
+        OP_ID=$(list_providers | jq -r .[$((RANDOM % OP_COUNT))])
+        ONEPROVIDER_IP=$(
+            do_curl -u "admin:password" "https://${ONEZONE_DOMAIN}/api/v3/onezone/providers/${OP_ID}" | jq -r .domain
+        )
+
+        echo "-------------------------------------------------------------------------"
+        echo "Oneclient will connect to the randomly selected Oneprovider at $ONEPROVIDER_IP."
+        echo "-------------------------------------------------------------------------"
+    fi
+
+    if ! await-supported-demo-space "$ONEPROVIDER_IP"; then
+        exit_and_kill_docker
+    fi
+
+    ONECLIENT_PROVIDER_HOST=$ONEPROVIDER_IP
+    ONECLIENT_ACCESS_TOKEN=$(demo-access-token)
+
+    echo ""
+    echo "-------------------------------------------------------------------------"
+    echo "Access token: ${ONECLIENT_ACCESS_TOKEN}"
+    echo "-------------------------------------------------------------------------"
+    echo ""
+
+    # export envs that are required by the oneclient application
+    export ONECLIENT_PROVIDER_HOST
+    export ONECLIENT_ACCESS_TOKEN
+
+    # After the main process finishes here, the oneclient entrypoint is run.
+
+    # Wait asynchronously for the demo-space to be mounted
     {
         if ! await-demo; then
             exit_and_kill_docker
@@ -97,7 +116,11 @@ main() {
         echo -e "\e[1;32m"
         echo "-------------------------------------------------------------------------"
         echo "Oneclient is ready!"
-        echo "The demo space is mounted under /mnt/oneclient/demo-space in the container."
+        echo "The demo space is mounted at /mnt/oneclient/demo-space in the container."
+        echo "Example commands to try: "
+        echo "  ~$ docker exec \$CONTAINER_ID bash -c 'echo test > /mnt/oneclient/demo-space/file.txt'"
+        echo "  ~$ docker exec \$CONTAINER_ID ls /mnt/oneclient/demo-space"
+        echo "  ~$ docker exec \$CONTAINER_ID cat /mnt/oneclient/demo-space/file.txt"
         echo "-------------------------------------------------------------------------"
         echo -e "\e[0m"
     } &
