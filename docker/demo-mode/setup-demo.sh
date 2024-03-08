@@ -31,6 +31,15 @@ list_providers() {
 }
 
 main() {
+    # A simple heuristic checking if the container is running in privileged mode, which
+    # is required for Oneclient to be mounted (which requires access to the fusermount command).
+    mkdir /tmp/mount_test
+    if ! mount -t tmpfs tmpfs /tmp/mount_test/; then
+        echo "ERROR: The Oneclient container must be run in privileged mode (use --privileged option)."
+        exit_and_kill_docker
+    fi
+    umount /tmp/mount_test/
+
     echo "${ONEZONE_IP} ${ONEZONE_DOMAIN}" >> /etc/hosts
 
     echo -e "\e[1;33m"
