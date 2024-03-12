@@ -9,7 +9,7 @@ if [[ -z $PROVIDER_HOST ]]; then
 fi
 
 # Optional second argument
-TIMEOUT=${2:-300}
+TIMEOUT=${2:-600}
 
 ACCESS_TOKEN=$(demo-access-token)
 LOOKUP_FILE_ID_URL="https://${PROVIDER_HOST}/api/v3/oneprovider/lookup-file-id/demo-space"

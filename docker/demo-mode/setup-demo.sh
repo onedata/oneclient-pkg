@@ -2,9 +2,10 @@
 
 source /root/demo-mode/better-curl.sh
 
+AWAIT_ONEPROVIDER_TIMEOUT=600
+
 ONEZONE_IP="$1"
 ONEPROVIDER_IP="$2"
-TIMEOUT=300
 
 # Regular expression to match IPv4 address
 IP_REGEX="^([0-9]{1,3}\.){3}[0-9]{1,3}$"
@@ -73,10 +74,10 @@ main() {
                 echo -e "\e[0m"
             fi
 
-            if [[ ${RETRY_NUM} -eq ${TIMEOUT} ]]; then
+            if [[ ${RETRY_NUM} -eq ${AWAIT_ONEPROVIDER_TIMEOUT} ]]; then
                 echo -e "\e[1;31m"
                 echo "-------------------------------------------------------------------------"
-                echo "ERROR: No Oneprovider service has become available within ${TIMEOUT} seconds."
+                echo "ERROR: No Oneprovider service has become available within ${AWAIT_ONEPROVIDER_TIMEOUT} seconds."
                 echo "Exiting..."
                 echo "-------------------------------------------------------------------------"
                 echo -e "\e[0m"

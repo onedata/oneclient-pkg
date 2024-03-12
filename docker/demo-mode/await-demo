@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Optional first argument
-TIMEOUT=${1:-300}
+TIMEOUT=${1:-600}
 
 RETRY_NUM=0
 while ! [ -d /mnt/oneclient/demo-space ]; do
