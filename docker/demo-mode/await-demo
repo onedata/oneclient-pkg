@@ -1,9 +1,5 @@
 #!/bin/bash
 
-source /root/demo-mode/better-curl.sh
-
-ONEZONE_IP=$(getent hosts onezone.local | awk '{ print $1 }')
-
 # Optional first argument
 TIMEOUT=${1:-300}
 
@@ -22,11 +18,10 @@ while ! [ -d /mnt/oneclient/demo-space ]; do
     if [[ ${RETRY_NUM} -eq ${TIMEOUT} ]]; then
         echo -e "\e[1;31m"
         echo "-------------------------------------------------------------------------"
-        echo "ERROR: Oneclient failed to mount demo-space from Oneprovider ${ONECLIENT_PROVIDER_HOST}"
-        echo "       within ${TIMEOUT} seconds, exiting."
+        echo "ERROR: Oneclient failed to mount the demo-space within ${TIMEOUT} seconds, exiting."
         echo "-------------------------------------------------------------------------"
         echo -e "\e[0m"
-        exit_and_kill_docker
+        exit 1
     fi
 
     sleep 1;
