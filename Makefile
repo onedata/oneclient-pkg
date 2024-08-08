@@ -38,7 +38,7 @@ ONECLIENT_VERSION             := $(shell echo ${ONECLIENT_VERSION} | tr - .)
 FSONEDATAFS_VERSION           := $(shell echo ${FSONEDATAFS_VERSION} | tr - .)
 ONEDATAFS_JUPYTER_VERSION     := $(shell echo ${ONEDATAFS_JUPYTER_VERSION} | tr - .)
 
-PKG_BUILDER_VERSION     ?= -4
+PKG_BUILDER_VERSION     ?= -1
 ONECLIENT_FPMPACKAGE_TMP ?= package_fpm
 
 ifdef IGNORE_XFAIL
