@@ -47,7 +47,7 @@ stages:
     jobs:
     - Oneclient Ubuntu Xenial
     - Oneclient Ubuntu Focal
-    - Oneclient Ubuntu Trusty
+    # - Oneclient Ubuntu Trusty
     - Oneclient Ubuntu Bionic
     # - Oneclient CentOS7
     - Oneclient Ubuntu Jammy
@@ -673,52 +673,52 @@ Oneclient Ubuntu Focal:
   artifact-subscriptions:
   - artifact: oneclient-bin.tar.gz
   - artifact: ones3-bin.tar.gz
-Oneclient Ubuntu Trusty:
-  key: OUT
-  tasks:
-  - checkout:
-      force-clean-build: 'true'
-      description: Checkout Default Repository
-  - script:
-      interpreter: BINSH_OR_CMDEXE
-      scripts:
-      - |-
-        set -e
+# Oneclient Ubuntu Trusty:
+#   key: OUT
+#   tasks:
+#   - checkout:
+#       force-clean-build: 'true'
+#       description: Checkout Default Repository
+#   - script:
+#       interpreter: BINSH_OR_CMDEXE
+#       scripts:
+#       - |-
+#         set -e
 
-        git remote set-url origin ${bamboo.repository.git.repositoryUrl}
-        git remote -v
-        make submodule=bamboos submodules
-        make submodule=oneclient submodules
+#         git remote set-url origin ${bamboo.repository.git.repositoryUrl}
+#         git remote -v
+#         make submodule=bamboos submodules
+#         make submodule=oneclient submodules
 
-        mkdir oneclient/package_fpm
-        mv oneclient-bin.tar.gz oneclient/package_fpm/oneclient-bin.tar.gz
-        mv ones3-bin.tar.gz oneclient/package_fpm/ones3-bin.tar.gz
-      description: Build modules
-  - script:
-      interpreter: BINSH_OR_CMDEXE
-      scripts:
-      - |-
-        set -e
+#         mkdir oneclient/package_fpm
+#         mv oneclient-bin.tar.gz oneclient/package_fpm/oneclient-bin.tar.gz
+#         mv ones3-bin.tar.gz oneclient/package_fpm/ones3-bin.tar.gz
+#       description: Build modules
+#   - script:
+#       interpreter: BINSH_OR_CMDEXE
+#       scripts:
+#       - |-
+#         set -e
 
-        make DISTRIBUTION=trusty oneclient_deb
-        make DISTRIBUTION=trusty ones3_deb
-      description: Build Oneclient Ubuntu Trusty package
-  - script:
-      interpreter: BINSH_OR_CMDEXE
-      scripts:
-      - tar -chzf trusty-oneclient.tar.gz package
-      description: Package
-  artifacts:
-  - name: trusty-oneclient.tar.gz
-    pattern: trusty-oneclient.tar.gz
-    shared: true
-    required: false
-  requirements:
-  - system.docker.executable
-  - onedata
-  artifact-subscriptions:
-  - artifact: oneclient-bin.tar.gz
-  - artifact: ones3-bin.tar.gz
+#         make DISTRIBUTION=trusty oneclient_deb
+#         make DISTRIBUTION=trusty ones3_deb
+#       description: Build Oneclient Ubuntu Trusty package
+#   - script:
+#       interpreter: BINSH_OR_CMDEXE
+#       scripts:
+#       - tar -chzf trusty-oneclient.tar.gz package
+#       description: Package
+#   artifacts:
+#   - name: trusty-oneclient.tar.gz
+#     pattern: trusty-oneclient.tar.gz
+#     shared: true
+#     required: false
+#   requirements:
+#   - system.docker.executable
+#   - onedata
+#   artifact-subscriptions:
+#   - artifact: oneclient-bin.tar.gz
+#   - artifact: ones3-bin.tar.gz
 Oneclient Ubuntu Bionic:
   key: OUB
   tasks:
@@ -881,7 +881,7 @@ Test Oneclient packages:
       scripts:
       - |-
         # tar -xzf centos7-oneclient.tar.gz
-        tar -xzf trusty-oneclient.tar.gz
+        # tar -xzf trusty-oneclient.tar.gz
         tar -xzf xenial-oneclient.tar.gz
         tar -xzf bionic-oneclient.tar.gz
         tar -xzf focal-oneclient.tar.gz
@@ -909,7 +909,7 @@ Test Oneclient packages:
   artifact-subscriptions:
   # - artifact: centos7-oneclient.tar.gz
   - artifact: xenial-oneclient.tar.gz
-  - artifact: trusty-oneclient.tar.gz
+  # - artifact: trusty-oneclient.tar.gz
   - artifact: bionic-oneclient.tar.gz
   - artifact: focal-oneclient.tar.gz
   - artifact: jammy-oneclient.tar.gz
@@ -954,8 +954,8 @@ Publish Oneclient packages:
         else
           # ./pkg.py --host docker_packages_devel push centos7-oneclient.tar.gz
           # mv pkg-list.json centos7-oneclient-pkg-list.json
-          ./pkg.py --host docker_packages_devel push trusty-oneclient.tar.gz
-          mv pkg-list.json trusty-oneclient-pkg-list.json
+          # ./pkg.py --host docker_packages_devel push trusty-oneclient.tar.gz
+          # mv pkg-list.json trusty-oneclient-pkg-list.json
           ./pkg.py --host docker_packages_devel push xenial-oneclient.tar.gz
           mv pkg-list.json xenial-oneclient-pkg-list.json
         fi
@@ -971,10 +971,10 @@ Publish Oneclient packages:
   #   pattern: centos7-oneclient-pkg-list.json
   #   shared: true
   #   required: false
-  - name: trusty-oneclient-pkg-list.json
-    pattern: trusty-oneclient-pkg-list.json
-    shared: true
-    required: false
+  # - name: trusty-oneclient-pkg-list.json
+  #   pattern: trusty-oneclient-pkg-list.json
+  #   shared: true
+  #   required: false
   - name: xenial-oneclient-pkg-list.json
     pattern: xenial-oneclient-pkg-list.json
     shared: true
@@ -994,7 +994,7 @@ Publish Oneclient packages:
   requirements:
   - publish_packages
   artifact-subscriptions:
-  - artifact: trusty-oneclient.tar.gz
+  # - artifact: trusty-oneclient.tar.gz
   # - artifact: centos7-oneclient.tar.gz
   - artifact: xenial-oneclient.tar.gz
   - artifact: bionic-oneclient.tar.gz
