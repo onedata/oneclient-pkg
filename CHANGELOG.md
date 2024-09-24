@@ -1,8 +1,8 @@
-Release notes for project oneclient-pkg
-=======================================
+# Release notes for project oneclient-pkg
 
-CHANGELOG
----------
+## CHANGELOG
+
+### 21.02.7
 
 ### 21.02.6
 
