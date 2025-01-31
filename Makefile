@@ -78,17 +78,15 @@ make_deb = $(call make, $(1)) -e DISTRIBUTION=$(DISTRIBUTION) --privileged --gra
 mv_deb = mv $(1)/package/packages/*_amd64.deb package/$(DISTRIBUTION)/binary-amd64 && \
 	mv $(1)/package/packages/*.tar.gz package/$(DISTRIBUTION)/source | true && \
 	mv $(1)/package/packages/*.dsc package/$(DISTRIBUTION)/source | true && \
-	mv $(1)/package/packages/*.diff.gz package/$(DISTRIBUTION)/source | true && \
 	mv $(1)/package/packages/*.debian.tar.xz package/$(DISTRIBUTION)/source | true && \
 	mv $(1)/package/packages/*.changes package/$(DISTRIBUTION)/source | true
 mv_noarch_deb = mv $(1)/package/packages/*_all.deb package/$(DISTRIBUTION)/binary-amd64 && \
 	mv $(1)/package/packages/*.tar.gz package/$(DISTRIBUTION)/source | true && \
 	mv $(1)/package/packages/*.dsc package/$(DISTRIBUTION)/source | true && \
-	mv $(1)/package/packages/*.diff.gz package/$(DISTRIBUTION)/source | true && \
 	mv $(1)/package/packages/*.debian.tar.xz package/$(DISTRIBUTION)/source | true && \
 	mv $(1)/package/packages/*.changes package/$(DISTRIBUTION)/source | true
 unpack = tar xzf $(1).tar.gz
-make_conda = $(call make, $(1)) -e CONDA_TOKEN=$(CONDA_TOKEN) -i onedata/conda:v4 $(2)
+make_conda = $(call make, $(1)) -e CONDA_TOKEN=$(CONDA_TOKEN) -i onedata/conda:v5 $(2)
 
 get_release:
 	@echo $(RELEASE)
