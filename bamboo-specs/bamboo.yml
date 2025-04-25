@@ -1061,9 +1061,6 @@ dependencies:
   block-strategy: none
   plans:
   - ODSRV-K8SD
-  - ODSRV-UP
-  - ODSRV-OAP
-  - ODSRV-MAOPT
 other:
   concurrent-build-plugin: system-default
 ---
