@@ -12,7 +12,7 @@ DOCKER_REG_NAME       ?= "docker.onedata.org"
 DOCKER_REG_USER       ?= ""
 DOCKER_REG_PASSWORD   ?= ""
 DOCKER_BASE_IMAGE     ?= "ubuntu:20.04"
-DOCKER_DEV_BASE_IMAGE ?= "onedata/worker:2102-9"
+DOCKER_DEV_BASE_IMAGE ?= "onedata/worker:25-1"
 
 ifeq ($(strip $(ONECLIENT_VERSION)),)
 ONECLIENT_VERSION       := $(shell git -C oneclient describe --tags --always --abbrev=7)
@@ -38,7 +38,7 @@ ONECLIENT_VERSION             := $(shell echo ${ONECLIENT_VERSION} | tr - .)
 FSONEDATAFS_VERSION           := $(shell echo ${FSONEDATAFS_VERSION} | tr - .)
 ONEDATAFS_JUPYTER_VERSION     := $(shell echo ${ONEDATAFS_JUPYTER_VERSION} | tr - .)
 
-PKG_BUILDER_VERSION     ?= 2102-4
+PKG_BUILDER_VERSION     ?= 25-1
 ONECLIENT_FPMPACKAGE_TMP ?= package_fpm
 
 ifdef IGNORE_XFAIL
