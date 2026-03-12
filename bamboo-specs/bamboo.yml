@@ -51,6 +51,7 @@ stages:
     - Oneclient Ubuntu Bionic
     # - Oneclient CentOS7
     - Oneclient Ubuntu Jammy
+    - Oneclient Ubuntu Noble
 - Test Oneclient:
     description: Test Oneclient packages
     manual: false
@@ -846,6 +847,49 @@ Oneclient Ubuntu Jammy:
   artifacts:
   - name: jammy-oneclient.tar.gz
     pattern: jammy-oneclient.tar.gz
+    shared: true
+    required: false
+  requirements:
+  - system.docker.executable
+  - onedata
+  artifact-subscriptions:
+  - artifact: oneclient-bin.tar.gz
+  - artifact: ones3-bin.tar.gz
+Oneclient Ubuntu Noble:
+  key: OUJ
+  tasks:
+  - checkout:
+      force-clean-build: 'true'
+      description: Checkout Default Repository
+  - script:
+      interpreter: BINSH_OR_CMDEXE
+      scripts:
+      - |-
+        set -e
+        git remote set-url origin ${bamboo.repository.git.repositoryUrl}
+        git remote -v
+        make submodule=bamboos submodules
+        make submodule=oneclient submodules
+        mkdir oneclient/package_fpm
+        mv oneclient-bin.tar.gz oneclient/package_fpm/oneclient-bin.tar.gz
+        mv ones3-bin.tar.gz oneclient/package_fpm/ones3-bin.tar.gz
+      description: Build modules
+  - script:
+      interpreter: BINSH_OR_CMDEXE
+      scripts:
+      - |-
+        set -e
+        make DISTRIBUTION=noble oneclient_deb
+        make DISTRIBUTION=noble ones3_deb
+      description: Build Oneclient Noble package
+  - script:
+      interpreter: BINSH_OR_CMDEXE
+      scripts:
+      - tar -chzf noble-oneclient.tar.gz package
+      description: Package
+  artifacts:
+  - name: noble-oneclient.tar.gz
+    pattern: noble-oneclient.tar.gz
     shared: true
     required: false
   requirements:

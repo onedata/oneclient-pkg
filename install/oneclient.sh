@@ -7,10 +7,11 @@ set -e
 #   'wget -qO- http://packages.onedata.org/oneclient.sh | sh'
 #
 
-url='http://packages.onedata.org'
-package="$1"
-if [ -z "$package" ]; then
-	package="oneclient"
+URL=http://packages.devel.onedata.org
+PACKAGE="$1"
+RELEASE=25
+if [ -z "$PACKAGE" ]; then
+	PACKAGE="oneclient"
 fi
 
 command_exists() {
@@ -96,68 +97,78 @@ do_install() {
 	case "$lsb_dist" in
 		ubuntu-xenial)
 			# onedata repo
-			$sh_c "$curl ${url}/onedata.gpg.key | apt-key add -"
-			$sh_c "echo \"deb [arch=amd64] ${url}/apt/ubuntu/2102 xenial main\" > /etc/apt/sources.list.d/onedata.list"
-			$sh_c "echo \"deb-src [arch=amd64] ${url}/apt/ubuntu/2102 xenial main\" >> /etc/apt/sources.list.d/onedata.list"
+			$sh_c "$curl ${URL}/onedata.gpg.key | apt-key add -"
+			$sh_c "echo \"deb [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} xenial main\" > /etc/apt/sources.list.d/onedata.list"
+			$sh_c "echo \"deb-src [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} xenial main\" >> /etc/apt/sources.list.d/onedata.list"
 
-			$sh_c "apt-get update && apt-get install -y ${package}"
+			$sh_c "apt-get update && apt-get install -y ${PACKAGE}"
 			echo_configuration
 			exit 0
 			;;
 		ubuntu-bionic)
 			# onedata repo
-			$sh_c "$curl ${url}/onedata.gpg.key | apt-key add -"
-			$sh_c "echo \"deb [arch=amd64] ${url}/apt/ubuntu/2102 bionic main\" > /etc/apt/sources.list.d/onedata.list"
-			$sh_c "echo \"deb-src [arch=amd64] ${url}/apt/ubuntu/2102 bionic main\" >> /etc/apt/sources.list.d/onedata.list"
+			$sh_c "$curl ${URL}/onedata.gpg.key | apt-key add -"
+			$sh_c "echo \"deb [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} bionic main\" > /etc/apt/sources.list.d/onedata.list"
+			$sh_c "echo \"deb-src [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} bionic main\" >> /etc/apt/sources.list.d/onedata.list"
 
-			$sh_c "apt-get update && apt-get install -y ${package}"
+			$sh_c "apt-get update && apt-get install -y ${PACKAGE}"
 			echo_configuration
 			exit 0
 			;;
 		ubuntu-disco)
 			# onedata repo
-			$sh_c "$curl ${url}/onedata.gpg.key | apt-key add -"
-			$sh_c "echo \"deb [arch=amd64] ${url}/apt/ubuntu/2102 disco main\" > /etc/apt/sources.list.d/onedata.list"
-			$sh_c "echo \"deb-src [arch=amd64] ${url}/apt/ubuntu/2102 disco main\" >> /etc/apt/sources.list.d/onedata.list"
+			$sh_c "$curl ${URL}/onedata.gpg.key | apt-key add -"
+			$sh_c "echo \"deb [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} disco main\" > /etc/apt/sources.list.d/onedata.list"
+			$sh_c "echo \"deb-src [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} disco main\" >> /etc/apt/sources.list.d/onedata.list"
 
-			$sh_c "apt-get update && apt-get install -y ${package}"
+			$sh_c "apt-get update && apt-get install -y ${PACKAGE}"
 			echo_configuration
 			exit 0
 			;;
 		ubuntu-focal)
 			# onedata repo
-			$sh_c "$curl ${url}/onedata.gpg.key | apt-key add -"
-			$sh_c "echo \"deb [arch=amd64] ${url}/apt/ubuntu/2102 focal main\" > /etc/apt/sources.list.d/onedata.list"
-			$sh_c "echo \"deb-src [arch=amd64] ${url}/apt/ubuntu/2102 focal main\" >> /etc/apt/sources.list.d/onedata.list"
+			$sh_c "$curl ${URL}/onedata.gpg.key | apt-key add -"
+			$sh_c "echo \"deb [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} focal main\" > /etc/apt/sources.list.d/onedata.list"
+			$sh_c "echo \"deb-src [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} focal main\" >> /etc/apt/sources.list.d/onedata.list"
 
-			$sh_c "apt-get update && apt-get install -y ${package}"
+			$sh_c "apt-get update && apt-get install -y ${PACKAGE}"
 			echo_configuration
 			exit 0
 			;;
 		ubuntu-jammy)
 			# onedata repo
-			$sh_c "$curl ${url}/onedata.gpg.key | apt-key add -"
-			$sh_c "echo \"deb [arch=amd64] ${url}/apt/ubuntu/2102 jammy main\" > /etc/apt/sources.list.d/onedata.list"
-			$sh_c "echo \"deb-src [arch=amd64] ${url}/apt/ubuntu/2102 jammy main\" >> /etc/apt/sources.list.d/onedata.list"
+			$sh_c "$curl ${URL}/onedata.gpg.key | apt-key add -"
+			$sh_c "echo \"deb [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} jammy main\" > /etc/apt/sources.list.d/onedata.list"
+			$sh_c "echo \"deb-src [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} jammy main\" >> /etc/apt/sources.list.d/onedata.list"
 
-			$sh_c "apt-get update && apt-get install -y ${package}"
+			$sh_c "apt-get update && apt-get install -y ${PACKAGE}"
+			echo_configuration
+			exit 0
+			;;
+		ubuntu-noble)
+			# onedata repo
+			$sh_c "$curl ${URL}/onedata.gpg.key | apt-key add -"
+			$sh_c "echo \"deb [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} noble main\" > /etc/apt/sources.list.d/onedata.list"
+			$sh_c "echo \"deb-src [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} noble main\" >> /etc/apt/sources.list.d/onedata.list"
+
+			$sh_c "apt-get update && apt-get install -y ${PACKAGE}"
 			echo_configuration
 			exit 0
 			;;
 		fedora)
 			# onedata repo
-			$sh_c "$curl ${url}/yum/2102/onedata_fedora_29.repo > /etc/yum.repos.d/onedata.repo"
+			$sh_c "$curl ${URL}/yum/${RELEASE}/onedata_fedora_29.repo > /etc/yum.repos.d/onedata.repo"
 
-			$sh_c "dnf -y --enablerepo=onedata install ${package}"
+			$sh_c "dnf -y --enablerepo=onedata install ${PACKAGE}"
 			echo_configuration
 			exit 0
 			;;
 		centos|rocky)
 			# onedata repo
-			$sh_c "$curl ${url}/yum/2102/onedata_centos_7x.repo > /etc/yum.repos.d/onedata.repo"
+			$sh_c "$curl ${URL}/yum/${RELEASE}/onedata_centos_7x.repo > /etc/yum.repos.d/onedata.repo"
 
 			$sh_c "yum -y install epel-release"
-			$sh_c "yum -y --enablerepo=onedata install ${package}"
+			$sh_c "yum -y --enablerepo=onedata install ${PACKAGE}"
 			echo_configuration
 			exit 0
 	esac
