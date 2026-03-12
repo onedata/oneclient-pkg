@@ -856,7 +856,7 @@ Oneclient Ubuntu Jammy:
   - artifact: oneclient-bin.tar.gz
   - artifact: ones3-bin.tar.gz
 Oneclient Ubuntu Noble:
-  key: OUJ
+  key: OUN
   tasks:
   - checkout:
       force-clean-build: 'true'
