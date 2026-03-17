@@ -401,7 +401,7 @@ codetag-tracker:
 
 #
 # Replace the release value in the convinience install script oneclient.sh and
-# upload it to packages.onedata.org
+# upload it to packages.devel.onedata.org or packages.onedata.org
 #
 publish-script-release-dev:
 	sed -i "s/^RELEASE=.*/RELEASE=$(RELEASE)/" install/oneclient.sh && \
@@ -410,3 +410,11 @@ publish-script-release-dev:
 
 publish-script-dev: publish-script-release-dev
 	ssh docker_packages_devel ln -sf /var/www/onedata/oneclient-$(RELEASE).sh /var/www/onedata/oneclient.sh
+
+publish-script-release:
+	sed -i "s/^RELEASE=.*/RELEASE=$(RELEASE)/" install/oneclient.sh && \
+	sed -i "s/^URL=.*/URL=http:\/\/packages.onedata.org/" install/oneclient.sh && \
+	scp install/oneclient.sh docker_packages:/var/www/onedata/oneclient-$(RELEASE).sh
+
+publish-script: publish-script-release
+	ssh docker_packages ln -sf /var/www/onedata/oneclient-$(RELEASE).sh /var/www/onedata/oneclient.sh
