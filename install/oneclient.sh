@@ -2,9 +2,9 @@
 set -e
 #
 # This script is meant for quick & easy install via:
-#   'curl -sSL http://packages.onedata.org/oneclient.sh | sh'
+#   'curl -sSL http://packages.devel.onedata.org/oneclient.sh | sh'
 # or:
-#   'wget -qO- http://packages.onedata.org/oneclient.sh | sh'
+#   'wget -qO- http://packages.devel.onedata.org/oneclient.sh | sh'
 #
 
 URL=http://packages.devel.onedata.org
@@ -147,9 +147,9 @@ do_install() {
 			;;
 		ubuntu-noble)
 			# onedata repo
-			$sh_c "$curl ${URL}/onedata.gpg.key | apt-key add -"
-			$sh_c "echo \"deb [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} noble main\" > /etc/apt/sources.list.d/onedata.list"
-			$sh_c "echo \"deb-src [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} noble main\" >> /etc/apt/sources.list.d/onedata.list"
+			$sh_c "$curl ${URL}/onedata.gpg.key | gpg --dearmor --yes -o /usr/share/keyrings/onedata.gpg"
+			$sh_c "echo \"deb [arch=amd64 signed-by=/usr/share/keyrings/onedata.gpg] ${URL}/apt/ubuntu/${RELEASE} noble main\" > /etc/apt/sources.list.d/onedata.list"
+			$sh_c "echo \"deb-src [arch=amd64 signed-by=/usr/share/keyrings/onedata.gpg] ${URL}/apt/ubuntu/${RELEASE} noble main\" >> /etc/apt/sources.list.d/onedata.list"
 
 			$sh_c "apt-get update && apt-get install -y ${PACKAGE}"
 			echo_configuration
