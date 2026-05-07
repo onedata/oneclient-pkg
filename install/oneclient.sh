@@ -7,9 +7,9 @@ set -e
 #   'wget -qO- http://packages.devel.onedata.org/oneclient.sh | sh'
 #
 
-URL=http://packages.devel.onedata.org
+URL=http://packages.onedata.org
 PACKAGE="$1"
-RELEASE=25
+RELEASE=2102
 if [ -z "$PACKAGE" ]; then
 	PACKAGE="oneclient"
 fi
@@ -107,6 +107,7 @@ do_install() {
 			;;
 		ubuntu-bionic)
 			# onedata repo
+			$sh_c "apt-get update && apt-get install -y gnupg"
 			$sh_c "$curl ${URL}/onedata.gpg.key | apt-key add -"
 			$sh_c "echo \"deb [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} bionic main\" > /etc/apt/sources.list.d/onedata.list"
 			$sh_c "echo \"deb-src [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} bionic main\" >> /etc/apt/sources.list.d/onedata.list"
@@ -115,18 +116,9 @@ do_install() {
 			echo_configuration
 			exit 0
 			;;
-		ubuntu-disco)
-			# onedata repo
-			$sh_c "$curl ${URL}/onedata.gpg.key | apt-key add -"
-			$sh_c "echo \"deb [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} disco main\" > /etc/apt/sources.list.d/onedata.list"
-			$sh_c "echo \"deb-src [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} disco main\" >> /etc/apt/sources.list.d/onedata.list"
-
-			$sh_c "apt-get update && apt-get install -y ${PACKAGE}"
-			echo_configuration
-			exit 0
-			;;
 		ubuntu-focal)
-			# onedata repo
+		        # onedata repo
+			$sh_c "apt-get update && apt-get install -y gnupg"
 			$sh_c "$curl ${URL}/onedata.gpg.key | apt-key add -"
 			$sh_c "echo \"deb [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} focal main\" > /etc/apt/sources.list.d/onedata.list"
 			$sh_c "echo \"deb-src [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} focal main\" >> /etc/apt/sources.list.d/onedata.list"
@@ -137,6 +129,7 @@ do_install() {
 			;;
 		ubuntu-jammy)
 			# onedata repo
+			$sh_c "apt-get update && apt-get install -y gnupg"
 			$sh_c "$curl ${URL}/onedata.gpg.key | apt-key add -"
 			$sh_c "echo \"deb [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} jammy main\" > /etc/apt/sources.list.d/onedata.list"
 			$sh_c "echo \"deb-src [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} jammy main\" >> /etc/apt/sources.list.d/onedata.list"
@@ -147,6 +140,7 @@ do_install() {
 			;;
 		ubuntu-noble)
 			# onedata repo
+			$sh_c "apt-get update && apt-get install -y gpg"
 			$sh_c "$curl ${URL}/onedata.gpg.key | gpg --dearmor --yes -o /usr/share/keyrings/onedata.gpg"
 			$sh_c "echo \"deb [arch=amd64 signed-by=/usr/share/keyrings/onedata.gpg] ${URL}/apt/ubuntu/${RELEASE} noble main\" > /etc/apt/sources.list.d/onedata.list"
 			$sh_c "echo \"deb-src [arch=amd64 signed-by=/usr/share/keyrings/onedata.gpg] ${URL}/apt/ubuntu/${RELEASE} noble main\" >> /etc/apt/sources.list.d/onedata.list"
