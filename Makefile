@@ -403,18 +403,18 @@ codetag-tracker:
 # Replace the release value in the convinience install script oneclient.sh and
 # upload it to packages.devel.onedata.org or packages.onedata.org
 #
-publish-script-release-dev:
+publish-script-dev:
 	sed -i "s/^RELEASE=.*/RELEASE=$(RELEASE)/" install/oneclient.sh && \
 	sed -i "s/^URL=.*/URL=http:\/\/packages.devel.onedata.org/" install/oneclient.sh && \
-	scp install/oneclient.sh docker_packages_devel:/var/www/onedata/oneclient-$(RELEASE).sh
+	scp install/oneclient.sh docker_packages_devel:/var/www/onedata/oneclient.sh
 
-publish-script-dev: publish-script-release-dev
-	ssh docker_packages_devel ln -sf /var/www/onedata/oneclient-$(RELEASE).sh /var/www/onedata/oneclient.sh
+publish-script-test:
+	sed -i "s/^RELEASE=.*/RELEASE=$(RELEASE)/" install/oneclient.sh && \
+	sed -i "s/^URL=.*/URL=http:\/\/packages.devel.onedata.org/" install/oneclient.sh && \
+	scp install/oneclient.sh docker_packages_devel:/var/www/onedata/oneclient-test.sh
 
-publish-script-release:
+publish-script:
 	sed -i "s/^RELEASE=.*/RELEASE=$(RELEASE)/" install/oneclient.sh && \
 	sed -i "s/^URL=.*/URL=http:\/\/packages.onedata.org/" install/oneclient.sh && \
-	scp install/oneclient.sh docker_packages:/var/www/onedata/oneclient-$(RELEASE).sh
+	scp install/oneclient.sh docker_packages:/var/www/onedata/oneclient.sh
 
-publish-script: publish-script-release
-	ssh docker_packages ln -sf /var/www/onedata/oneclient-$(RELEASE).sh /var/www/onedata/oneclient.sh

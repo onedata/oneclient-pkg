@@ -2,16 +2,46 @@
 set -e
 #
 # This script is meant for quick & easy install via:
-#   'curl -sSL http://packages.devel.onedata.org/oneclient.sh | sh'
+#   'curl -sSL http://packages.onedata.org/oneclient.sh | sh'
 # or:
-#   'wget -qO- http://packages.devel.onedata.org/oneclient.sh | sh'
+#   'wget -qO- http://packages.onedata.org/oneclient.sh | sh'
+# or to install specific oneclient package/version:
+#   'curl -sSL http://packages.onedata.org/oneclient.sh | sh -s -- --package oneclient=21.02.1-1~jammy'
+#   'curl -sSL http://packages.onedata.org/oneclient.sh | sh -s -- --version 21.02.1'
 #
 
-URL=http://packages.onedata.org
-PACKAGE="$1"
-RELEASE=2102
-if [ -z "$PACKAGE" ]; then
-	PACKAGE="oneclient"
+URL=http://packages.devel.onedata.org
+RELEASE=25
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+	-p|--package)
+	    if [ -z "$2" -o "$(echo "$2" | cut -c1)" = "-" ]; then
+		echo "Error: --package requires a value."
+		exit 1
+	    fi
+	    PACKAGE="$2"
+	    shift 2 # Move past the flag and the value
+	    ;;
+	-v|--version)
+	    if [ -z "$2" -o "$(echo "$2" | cut -c1)" = "-" ]; then
+		echo "Error: --version requires a value."
+		exit 1
+	    fi
+	    VERSION="$2"
+	    shift 2 # Move past the flag and the value
+	    ;;
+	*)
+	    echo "Unknown option: $1"
+	    echo 'Usage: oneclient.sh [--package <package> | --version <version>]'
+	    exit 1
+	    ;;
+    esac
+done
+
+if [ -n "$PACKAGE" -a -n "$VERSION" ]; then
+    echo "Error: You cannot use --package and --version together."
+    exit 1
 fi
 
 command_exists() {
@@ -94,13 +124,34 @@ do_install() {
 	fi
 
 	lsb_dist="$(echo "$lsb_dist" | tr '[:upper:]' '[:lower:]')"
+
+        if [ -z "$PACKAGE" -a -z "$VERSION" ]; then
+            PACKAGE="oneclient"
+        elif [ "${lsb_dist%-*}" = 'ubuntu' ]; then
+            if [ -n "$VERSION" ]; then
+                if [ "${VERSION%%.*}" -lt 25 ]; then
+                    RELEASE=$(echo "$VERSION" | cut -d. -f1,2 | tr -d '.')
+                else
+                    RELEASE=$(echo "$VERSION" | cut -d. -f1 | tr -d '.')
+                fi
+                PACKAGE="oneclient=${VERSION}-1~${lsb_dist#*-}"
+            else
+                VERSION="${PACKAGE#*=}"
+                VERSION="${VERSION%-*}"
+                if [ "${VERSION%%.*}" -lt 25 ]; then
+                    RELEASE=$(echo "$VERSION" | cut -d. -f1,2 | tr -d '.')
+                else
+                    RELEASE=$(echo "$VERSION" | cut -d. -f1 | tr -d '.')
+                fi
+            fi
+        fi
+
 	case "$lsb_dist" in
 		ubuntu-xenial)
 			# onedata repo
 			$sh_c "$curl ${URL}/onedata.gpg.key | apt-key add -"
 			$sh_c "echo \"deb [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} xenial main\" > /etc/apt/sources.list.d/onedata.list"
 			$sh_c "echo \"deb-src [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} xenial main\" >> /etc/apt/sources.list.d/onedata.list"
-
 			$sh_c "apt-get update && apt-get install -y ${PACKAGE}"
 			echo_configuration
 			exit 0
@@ -111,7 +162,6 @@ do_install() {
 			$sh_c "$curl ${URL}/onedata.gpg.key | apt-key add -"
 			$sh_c "echo \"deb [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} bionic main\" > /etc/apt/sources.list.d/onedata.list"
 			$sh_c "echo \"deb-src [arch=amd64] ${URL}/apt/ubuntu/${RELEASE} bionic main\" >> /etc/apt/sources.list.d/onedata.list"
-
 			$sh_c "apt-get update && apt-get install -y ${PACKAGE}"
 			echo_configuration
 			exit 0
@@ -149,22 +199,25 @@ do_install() {
 			echo_configuration
 			exit 0
 			;;
-		fedora)
-			# onedata repo
-			$sh_c "$curl ${URL}/yum/${RELEASE}/onedata_fedora_29.repo > /etc/yum.repos.d/onedata.repo"
+                ##############################################################################################
+                # Fedora and centos|rocky packages are not supported now but may be supported in the future. #
+                ##############################################################################################
+		# fedora)
+		# 	# onedata repo
+		# 	$sh_c "$curl ${URL}/yum/${RELEASE}/onedata_fedora_29.repo > /etc/yum.repos.d/onedata.repo"
 
-			$sh_c "dnf -y --enablerepo=onedata install ${PACKAGE}"
-			echo_configuration
-			exit 0
-			;;
-		centos|rocky)
-			# onedata repo
-			$sh_c "$curl ${URL}/yum/${RELEASE}/onedata_centos_7x.repo > /etc/yum.repos.d/onedata.repo"
+		# 	$sh_c "dnf -y --enablerepo=onedata install ${PACKAGE}"
+		# 	echo_configuration
+		# 	exit 0
+		# 	;;
+		# centos|rocky)
+		# 	# onedata repo
+		# 	$sh_c "$curl ${URL}/yum/${RELEASE}/onedata_centos_7x.repo > /etc/yum.repos.d/onedata.repo"
 
-			$sh_c "yum -y install epel-release"
-			$sh_c "yum -y --enablerepo=onedata install ${PACKAGE}"
-			echo_configuration
-			exit 0
+		# 	$sh_c "yum -y install epel-release"
+		# 	$sh_c "yum -y --enablerepo=onedata install ${PACKAGE}"
+		# 	echo_configuration
+		# 	exit 0
 	esac
 
 	# intentionally mixed spaces and tabs here -- tabs are stripped by "<<-'EOF'", spaces are kept in the output
