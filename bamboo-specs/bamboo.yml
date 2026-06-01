@@ -51,6 +51,7 @@ stages:
     - Oneclient Ubuntu Bionic
     # - Oneclient CentOS7
     - Oneclient Ubuntu Jammy
+    - Oneclient Ubuntu Noble
 - Test Oneclient:
     description: Test Oneclient packages
     manual: false
@@ -854,6 +855,49 @@ Oneclient Ubuntu Jammy:
   artifact-subscriptions:
   - artifact: oneclient-bin.tar.gz
   - artifact: ones3-bin.tar.gz
+Oneclient Ubuntu Noble:
+  key: OUN
+  tasks:
+  - checkout:
+      force-clean-build: 'true'
+      description: Checkout Default Repository
+  - script:
+      interpreter: BINSH_OR_CMDEXE
+      scripts:
+      - |-
+        set -e
+        git remote set-url origin ${bamboo.repository.git.repositoryUrl}
+        git remote -v
+        make submodule=bamboos submodules
+        make submodule=oneclient submodules
+        mkdir oneclient/package_fpm
+        mv oneclient-bin.tar.gz oneclient/package_fpm/oneclient-bin.tar.gz
+        mv ones3-bin.tar.gz oneclient/package_fpm/ones3-bin.tar.gz
+      description: Build modules
+  - script:
+      interpreter: BINSH_OR_CMDEXE
+      scripts:
+      - |-
+        set -e
+        make DISTRIBUTION=noble oneclient_deb
+        make DISTRIBUTION=noble ones3_deb
+      description: Build Oneclient Noble package
+  - script:
+      interpreter: BINSH_OR_CMDEXE
+      scripts:
+      - tar -chzf noble-oneclient.tar.gz package
+      description: Package
+  artifacts:
+  - name: noble-oneclient.tar.gz
+    pattern: noble-oneclient.tar.gz
+    shared: true
+    required: false
+  requirements:
+  - system.docker.executable
+  - onedata
+  artifact-subscriptions:
+  - artifact: oneclient-bin.tar.gz
+  - artifact: ones3-bin.tar.gz
 Test Oneclient packages:
   key: TOP
   other:
@@ -886,6 +930,7 @@ Test Oneclient packages:
         tar -xzf bionic-oneclient.tar.gz
         tar -xzf focal-oneclient.tar.gz
         tar -xzf jammy-oneclient.tar.gz
+        tar -xzf noble-oneclient.tar.gz
       description: Unpack package artifacts
   - script:
       interpreter: BINSH_OR_CMDEXE
@@ -913,6 +958,7 @@ Test Oneclient packages:
   - artifact: bionic-oneclient.tar.gz
   - artifact: focal-oneclient.tar.gz
   - artifact: jammy-oneclient.tar.gz
+  - artifact: noble-oneclient.tar.gz
 Publish Oneclient packages:
   key: POP
   other:
@@ -951,6 +997,8 @@ Publish Oneclient packages:
           mv pkg-list.json focal-oneclient-pkg-list.json
           ./pkg.py --host docker_packages_devel --release $RELEASE push jammy-oneclient.tar.gz
           mv pkg-list.json jammy-oneclient-pkg-list.json
+          ./pkg.py --host docker_packages_devel --release $RELEASE push noble-oneclient.tar.gz
+          mv pkg-list.json noble-oneclient-pkg-list.json
         else
           # ./pkg.py --host docker_packages_devel push centos7-oneclient.tar.gz
           # mv pkg-list.json centos7-oneclient-pkg-list.json
@@ -991,6 +1039,10 @@ Publish Oneclient packages:
     pattern: jammy-oneclient-pkg-list.json
     shared: true
     required: false
+  - name: noble-oneclient-pkg-list.json
+    pattern: noble-oneclient-pkg-list.json
+    shared: true
+    required: false
   requirements:
   - publish_packages
   artifact-subscriptions:
@@ -1000,6 +1052,7 @@ Publish Oneclient packages:
   - artifact: bionic-oneclient.tar.gz
   - artifact: focal-oneclient.tar.gz
   - artifact: jammy-oneclient.tar.gz
+  - artifact: noble-oneclient.tar.gz
 Publish Oneclient docker:
   key: POD
   other:
