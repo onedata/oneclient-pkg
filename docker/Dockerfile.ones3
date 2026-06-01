@@ -5,7 +5,7 @@ MAINTAINER Bartek Kryza <bkryza@gmail.com>
 # Build arguments
 ARG RELEASE_TYPE
 ARG RELEASE="2102"
-ARG VERSION=""
+ARG ONECLIENT_VERSION=""
 ARG DISTRIBUTION="focal"
 ARG ONES3_PACKAGE="ones3"
 ARG HTTP_PROXY
@@ -35,7 +35,7 @@ RUN case ${RELEASE_TYPE} in \
             curl -O http://packages.devel.onedata.org/oneclient-${RELEASE}.sh; \
             ;; \
         esac && \
-        sh oneclient-${RELEASE}.sh ${ONES3_PACKAGE}=${VERSION}-1~${DISTRIBUTION}
+        sh oneclient-${RELEASE}.sh ${ONES3_PACKAGE}=${ONECLIENT_VERSION}-1~${DISTRIBUTION}
 
 RUN mv /tmp/excludes.bak /etc/dpkg/dpkg.cfg.d/excludes
 
