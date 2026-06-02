@@ -45,7 +45,8 @@ class Distribution(object):
 def setup_command():
     return 'echo -n \'Acquire::http::Proxy \"http://proxy.devel.onedata.org:3128\";\' > /etc/apt/apt.conf.d/proxy.conf && ' \
         'apt-get update && ' \
-        'apt-get install -y ca-certificates locales python wget curl gnupg && ' \
+        'DEBIAN_FRONTEND=noninteractive apt-get install -y ca-certificates locales {{python_pkg}} wget curl gnupg && ' \
+        '(if [ ! -f /usr/bin/python ]; then apt install -y python-is-python3; fi) && ' \
         'wget -qO- {url}/onedata.gpg.key | apt-key add - && ' \
         'echo "deb {url}/apt/ubuntu/{{release}} {{dist}} main" > /etc/apt/sources.list.d/onedata.list && ' \
         'echo "deb-src {url}/apt/ubuntu/{{release}} {{dist}} main" >> /etc/apt/sources.list.d/onedata.list && ' \
@@ -81,8 +82,13 @@ def onezone(request):
                 params=['xenial', 'bionic', 'focal', 'jammy', 'noble'])
 def oneclient(request, setup_command):
     distribution = Distribution(request, privileged=True)
+    if distribution.name in ['xenial', 'bionic', 'focal']:
+        python_pkg = 'python'
+    else:
+        python_pkg = 'python3'
     command = setup_command.format(dist=distribution.name,
-                                   release=distribution.release)
+                                   release=distribution.release,
+                                   python_pkg=python_pkg)
 
     assert 0 == docker.exec_(distribution.container,
                              interactive=True,
