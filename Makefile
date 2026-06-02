@@ -226,7 +226,7 @@ docker_oneclient_base:
                       --build-arg BASE_IMAGE=$(DOCKER_BASE_IMAGE) \
                       --build-arg RELEASE_TYPE=$(DOCKER_RELEASE) \
                       --build-arg RELEASE=$(RELEASE) \
-                      --build-arg VERSION=$(ONECLIENT_VERSION) \
+                      --build-arg ONECLIENT_VERSION=$(ONECLIENT_VERSION) \
                       --build-arg FSONEDATAFS_VERSION=$(FSONEDATAFS_VERSION) \
                       --build-arg HTTP_PROXY=$(HTTP_PROXY) \
                       --build-arg ONECLIENT_PACKAGE=oneclient-base \
@@ -246,7 +246,7 @@ docker_oneclient:
                       --build-arg BASE_IMAGE=$(DOCKER_BASE_IMAGE) \
                       --build-arg RELEASE_TYPE=$(DOCKER_RELEASE) \
                       --build-arg RELEASE=$(RELEASE) \
-                      --build-arg VERSION=$(ONECLIENT_VERSION) \
+                      --build-arg ONECLIENT_VERSION=$(ONECLIENT_VERSION) \
                       --build-arg FSONEDATAFS_VERSION=$(FSONEDATAFS_VERSION) \
                       --build-arg HTTP_PROXY=$(HTTP_PROXY) \
                       --build-arg ONECLIENT_PACKAGE=oneclient \
@@ -262,7 +262,7 @@ docker_ones3:
                       --build-arg BASE_IMAGE=$(DOCKER_BASE_IMAGE) \
                       --build-arg RELEASE_TYPE=$(DOCKER_RELEASE) \
                       --build-arg RELEASE=$(RELEASE) \
-                      --build-arg VERSION=$(ONECLIENT_VERSION) \
+                      --build-arg ONECLIENT_VERSION=$(ONECLIENT_VERSION) \
                       --build-arg HTTP_PROXY=$(HTTP_PROXY) \
                       --build-arg ONES3_PACKAGE=ones3 \
                       --report docker-ones3-build-report.txt \
@@ -276,7 +276,7 @@ docker_dev_oneclient:
                       --password $(DOCKER_REG_PASSWORD) \
                       --build-arg BASE_IMAGE=$(DOCKER_DEV_BASE_IMAGE) \
                       --build-arg RELEASE=$(RELEASE) \
-                      --build-arg VERSION=$(ONECLIENT_VERSION) \
+                      --build-arg ONECLIENT_VERSION=$(ONECLIENT_VERSION) \
                       --build-arg FSONEDATAFS_VERSION=$(FSONEDATAFS_VERSION) \
                       --build-arg HTTP_PROXY=$(HTTP_PROXY) \
                       --build-arg ONECLIENT_PACKAGE=oneclient \
@@ -291,7 +291,7 @@ docker_dev_ones3:
                       --password $(DOCKER_REG_PASSWORD) \
                       --build-arg BASE_IMAGE=$(DOCKER_DEV_BASE_IMAGE) \
                       --build-arg RELEASE=$(RELEASE) \
-                      --build-arg VERSION=$(ONECLIENT_VERSION) \
+                      --build-arg ONECLIENT_VERSION=$(ONECLIENT_VERSION) \
                       --build-arg HTTP_PROXY=$(HTTP_PROXY) \
                       --build-arg ONES3_PACKAGE=ones3 \
                       --report docker-dev-ones3-build-report.txt \
