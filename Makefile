@@ -398,3 +398,23 @@ onedatafs_jupyter_conda:
 
 codetag-tracker:
 	./bamboos/scripts/codetag-tracker.sh --branch=${BRANCH} --excluded-dirs=node_package,oneclient,fs-onedatafs
+
+#
+# Replace the release value in the convinience install script oneclient.sh and
+# upload it to packages.devel.onedata.org or packages.onedata.org
+#
+publish-script-dev:
+	sed -i "s/^RELEASE=.*/RELEASE=$(RELEASE)/" install/oneclient.sh && \
+	sed -i "s/^URL=.*/URL=http:\/\/packages.devel.onedata.org/" install/oneclient.sh && \
+	scp install/oneclient.sh docker_packages_devel:/var/www/onedata/oneclient.sh
+
+publish-script-test:
+	sed -i "s/^RELEASE=.*/RELEASE=$(RELEASE)/" install/oneclient.sh && \
+	sed -i "s/^URL=.*/URL=http:\/\/packages.devel.onedata.org/" install/oneclient.sh && \
+	scp install/oneclient.sh docker_packages_devel:/var/www/onedata/oneclient-test.sh
+
+publish-script:
+	sed -i "s/^RELEASE=.*/RELEASE=$(RELEASE)/" install/oneclient.sh && \
+	sed -i "s/^URL=.*/URL=http:\/\/packages.onedata.org/" install/oneclient.sh && \
+	scp install/oneclient.sh docker_packages:/var/www/onedata/oneclient.sh
+
