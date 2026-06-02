@@ -103,7 +103,8 @@ def oneclient(request, setup_command):
 def oneclient_base(request, setup_command):
     distribution = Distribution(request, privileged=True)
     command = setup_command.format(dist=distribution.name,
-                                   release=distribution.release)
+                                   release=distribution.release,
+                                   python_pkg='python')
 
     assert 0 == docker.exec_(distribution.container,
                              interactive=True,
@@ -126,7 +127,8 @@ def oneprovider(request, onezone, setup_command):
     # This link will cause connections to 'oz.1234.test' reach 'node.oz.1234.test'
     distribution = Distribution(request, link={onezone_node: onezone_domain})
     command = setup_command.format(dist=distribution.name,
-                                   release=distribution.release)
+                                   release=distribution.release,
+                                   python_pkg='python')
     command = '{command} && ' \
         'apt-get install -y python-pip gnupg2 libssl1.0.0 && ' \
         'pip install requests'.format(command=command)
