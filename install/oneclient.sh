@@ -12,6 +12,17 @@ set -e
 
 URL=http://packages.devel.onedata.org
 RELEASE=25
+PACKAGE=""
+VERSION=""
+NAME=""
+
+usage() {
+    echo 'Usage: oneclient.sh [--package <package> | --version <version> [ <name> ]]'
+    echo '  <package> means complete package string with version, e.g., oneclient=25.0-1~noble'
+    echo '  <version> means product version string, e.g., 25.0'
+    echo '  <name> means just package name, e.g., oneclient'
+    exit 1
+}
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -31,17 +42,29 @@ while [ $# -gt 0 ]; do
 	    VERSION="$2"
 	    shift 2 # Move past the flag and the value
 	    ;;
-	*)
-	    echo "Unknown option: $1"
-	    echo 'Usage: oneclient.sh [--package <package> | --version <version>]'
-	    exit 1
-	    ;;
+        -*)
+            echo "Error: Unknown option $1"
+            usage
+            ;;
+        *)
+            # If NAME is already set, we have too many positional arguments
+            if [ -n "$NAME" ]; then
+                echo "Error: Too many arguments."
+                usage
+            fi
+            NAME="$1"
+            shift
+            ;;
     esac
 done
 
 if [ -n "$PACKAGE" -a -n "$VERSION" ]; then
     echo "Error: You cannot use --package and --version together."
-    exit 1
+    usage
+fi
+if [ -n "$PACKAGE" -a -n "$NAME" ]; then
+    echo 'Error: You cannot use --package and <name> together.'
+    usage
 fi
 
 command_exists() {
@@ -49,11 +72,10 @@ command_exists() {
 }
 
 echo_configuration() {
-	# intentionally mixed spaces and tabs here -- tabs are stripped by "<<-EOF", spaces are kept in the output
-	cat <<-'EOF'
-	Installation has been completed successfully.
-	Run 'oneclient --help' for usage info.
-	EOF
+    echo "Installation has been completed successfully."
+    if [ -z "${NAME}" -o "${NAME}" = 'oneclient' ]; then
+	echo "Run 'oneclient --help' for usage info."
+    fi
 }
 
 do_install() {
@@ -125,7 +147,7 @@ do_install() {
 
 	lsb_dist="$(echo "$lsb_dist" | tr '[:upper:]' '[:lower:]')"
 
-        if [ -z "$PACKAGE" -a -z "$VERSION" ]; then
+        if [ -z "$PACKAGE" -a -z "$VERSION" -a "$NAME" ]; then
             PACKAGE="oneclient"
         elif [ "${lsb_dist%-*}" = 'ubuntu' ]; then
             if [ -n "$VERSION" ]; then
@@ -134,7 +156,11 @@ do_install() {
                 else
                     RELEASE=$(echo "$VERSION" | cut -d. -f1 | tr -d '.')
                 fi
-                PACKAGE="oneclient=${VERSION}-1~${lsb_dist#*-}"
+		if [ -n "$NAME" ]; then
+                    PACKAGE="${NAME}=${VERSION}-1~${lsb_dist#*-}"
+		else
+                    PACKAGE="oneclient=${VERSION}-1~${lsb_dist#*-}"
+		fi
             else
                 VERSION="${PACKAGE#*=}"
                 VERSION="${VERSION%-*}"
