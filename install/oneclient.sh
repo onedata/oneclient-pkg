@@ -147,30 +147,32 @@ do_install() {
 
 	lsb_dist="$(echo "$lsb_dist" | tr '[:upper:]' '[:lower:]')"
 
-        if [ -z "$PACKAGE" -a -z "$VERSION" -a "$NAME" ]; then
-            PACKAGE="oneclient"
-        elif [ "${lsb_dist%-*}" = 'ubuntu' ]; then
-            if [ -n "$VERSION" ]; then
-                if [ "${VERSION%%.*}" -lt 25 ]; then
-                    RELEASE=$(echo "$VERSION" | cut -d. -f1,2 | tr -d '.')
-                else
-                    RELEASE=$(echo "$VERSION" | cut -d. -f1 | tr -d '.')
-                fi
-		if [ -n "$NAME" ]; then
-                    PACKAGE="${NAME}=${VERSION}-1~${lsb_dist#*-}"
-		else
-                    PACKAGE="oneclient=${VERSION}-1~${lsb_dist#*-}"
-		fi
+    if [ -z "$PACKAGE" ] && [ -z "$VERSION" ] && [ -z "$NAME" ]; then
+        PACKAGE="oneclient"
+    elif [ "${lsb_dist%-*}" = 'ubuntu' ]; then
+        if [ -n "$VERSION" ]; then
+            if [ "${VERSION%%.*}" -lt 25 ]; then
+                RELEASE=$(echo "$VERSION" | cut -d. -f1,2 | tr -d '.')
             else
-                VERSION="${PACKAGE#*=}"
-                VERSION="${VERSION%-*}"
-                if [ "${VERSION%%.*}" -lt 25 ]; then
-                    RELEASE=$(echo "$VERSION" | cut -d. -f1,2 | tr -d '.')
-                else
-                    RELEASE=$(echo "$VERSION" | cut -d. -f1 | tr -d '.')
-                fi
+                RELEASE=$(echo "$VERSION" | cut -d. -f1)
+            fi
+
+            if [ -n "$NAME" ]; then
+                PACKAGE="${NAME}=${VERSION}-1~${lsb_dist#*-}"
+            else
+                PACKAGE="oneclient=${VERSION}-1~${lsb_dist#*-}"
+            fi
+        else
+            VERSION="${PACKAGE#*=}"
+            VERSION="${VERSION%-*}"
+
+            if [ "${VERSION%%.*}" -lt 25 ]; then
+                RELEASE=$(echo "$VERSION" | cut -d. -f1,2 | tr -d '.')
+            else
+                RELEASE=$(echo "$VERSION" | cut -d. -f1)
             fi
         fi
+    fi
 
 	case "$lsb_dist" in
 		ubuntu-xenial)
