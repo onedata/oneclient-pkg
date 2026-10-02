@@ -6,7 +6,8 @@ dist = sys.argv[1]
 # get package
 packages = check_output(['ls', '/root/pkg']).split()
 packages = sorted(packages, reverse=True)
-oneclient_package = [path for path in packages
+packages_str = [p.decode('utf-8') for p in packages]
+oneclient_package = [path for path in packages_str
                      if path.startswith('oneclient')
                      and (dist in path)
                      and not ((path.startswith('oneclient-base')

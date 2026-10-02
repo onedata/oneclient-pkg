@@ -12,7 +12,7 @@ DOCKER_REG_NAME       ?= "docker.onedata.org"
 DOCKER_REG_USER       ?= ""
 DOCKER_REG_PASSWORD   ?= ""
 DOCKER_BASE_IMAGE     ?= "ubuntu:20.04"
-DOCKER_DEV_BASE_IMAGE ?= "onedata/worker:2102-9"
+DOCKER_DEV_BASE_IMAGE ?= "onedata/worker:2202-2"
 
 ifeq ($(strip $(ONECLIENT_VERSION)),)
 ONECLIENT_VERSION       := $(shell git -C oneclient describe --tags --always --abbrev=7)
@@ -38,7 +38,7 @@ ONECLIENT_VERSION             := $(shell echo ${ONECLIENT_VERSION} | tr - .)
 FSONEDATAFS_VERSION           := $(shell echo ${FSONEDATAFS_VERSION} | tr - .)
 ONEDATAFS_JUPYTER_VERSION     := $(shell echo ${ONEDATAFS_JUPYTER_VERSION} | tr - .)
 
-PKG_BUILDER_VERSION     ?= -1
+PKG_BUILDER_VERSION     ?= 2202-1
 ONECLIENT_FPMPACKAGE_TMP ?= package_fpm
 
 ifdef IGNORE_XFAIL
@@ -69,12 +69,12 @@ NO_CACHE :=  $(shell if [ "${NO_CACHE}" != "" ]; then echo "--no-cache"; fi)
 make = $(1)/make.py -s $(1) -r . $(NO_CACHE)
 clean = $(call make, $(1)) clean
 retry = RETRIES=$(RETRIES); until $(1) && return 0 || [ $$RETRIES -eq 0 ]; do sleep $(RETRY_SLEEP); RETRIES=`expr $$RETRIES - 1`; echo "===== Cleaning up... ====="; $(if $2,$2,:); echo "\n\n\n===== Retrying build... ====="; done; return 1 
-make_rpm = $(call make, $(1)) -e DISTRIBUTION=$(DISTRIBUTION) -e RELEASE=$(RELEASE) --privileged --group mock -i onedata/rpm_builder:$(DISTRIBUTION)-$(RELEASE)$(PKG_BUILDER_VERSION) $(2)  
+make_rpm = $(call make, $(1)) -e DISTRIBUTION=$(DISTRIBUTION) -e RELEASE=$(RELEASE) --privileged --group mock -i onedata/rpm_builder:$(DISTRIBUTION)-$(PKG_BUILDER_VERSION) $(2)  
 mv_rpm = mv $(1)/package/packages/*.src.rpm package/$(DISTRIBUTION)/SRPMS && \
 	mv $(1)/package/packages/*.x86_64.rpm package/$(DISTRIBUTION)/x86_64
 mv_noarch_rpm = mv $(1)/package/packages/*.src.rpm package/$(DISTRIBUTION)/SRPMS && \
 	mv $(1)/package/packages/*.noarch.rpm package/$(DISTRIBUTION)/x86_64
-make_deb = $(call make, $(1)) -e DISTRIBUTION=$(DISTRIBUTION) --privileged --grant-sudo-rights --group sbuild -i onedata/deb_builder:$(DISTRIBUTION)-$(RELEASE)$(PKG_BUILDER_VERSION) $(2)
+make_deb = $(call make, $(1)) -e DISTRIBUTION=$(DISTRIBUTION) --privileged --grant-sudo-rights --group sbuild -i onedata/deb_builder:$(DISTRIBUTION)-$(PKG_BUILDER_VERSION) $(2)
 mv_deb = mv $(1)/package/packages/*_amd64.deb package/$(DISTRIBUTION)/binary-amd64 && \
 	mv $(1)/package/packages/*.tar.gz package/$(DISTRIBUTION)/source | true && \
 	mv $(1)/package/packages/*.dsc package/$(DISTRIBUTION)/source | true && \
@@ -226,7 +226,7 @@ docker_oneclient_base:
                       --build-arg BASE_IMAGE=$(DOCKER_BASE_IMAGE) \
                       --build-arg RELEASE_TYPE=$(DOCKER_RELEASE) \
                       --build-arg RELEASE=$(RELEASE) \
-                      --build-arg VERSION=$(ONECLIENT_VERSION) \
+                      --build-arg ONECLIENT_VERSION=$(ONECLIENT_VERSION) \
                       --build-arg FSONEDATAFS_VERSION=$(FSONEDATAFS_VERSION) \
                       --build-arg HTTP_PROXY=$(HTTP_PROXY) \
                       --build-arg ONECLIENT_PACKAGE=oneclient-base \
@@ -246,7 +246,7 @@ docker_oneclient:
                       --build-arg BASE_IMAGE=$(DOCKER_BASE_IMAGE) \
                       --build-arg RELEASE_TYPE=$(DOCKER_RELEASE) \
                       --build-arg RELEASE=$(RELEASE) \
-                      --build-arg VERSION=$(ONECLIENT_VERSION) \
+                      --build-arg ONECLIENT_VERSION=$(ONECLIENT_VERSION) \
                       --build-arg FSONEDATAFS_VERSION=$(FSONEDATAFS_VERSION) \
                       --build-arg HTTP_PROXY=$(HTTP_PROXY) \
                       --build-arg ONECLIENT_PACKAGE=oneclient \
@@ -262,7 +262,7 @@ docker_ones3:
                       --build-arg BASE_IMAGE=$(DOCKER_BASE_IMAGE) \
                       --build-arg RELEASE_TYPE=$(DOCKER_RELEASE) \
                       --build-arg RELEASE=$(RELEASE) \
-                      --build-arg VERSION=$(ONECLIENT_VERSION) \
+                      --build-arg ONECLIENT_VERSION=$(ONECLIENT_VERSION) \
                       --build-arg HTTP_PROXY=$(HTTP_PROXY) \
                       --build-arg ONES3_PACKAGE=ones3 \
                       --report docker-ones3-build-report.txt \
@@ -276,7 +276,7 @@ docker_dev_oneclient:
                       --password $(DOCKER_REG_PASSWORD) \
                       --build-arg BASE_IMAGE=$(DOCKER_DEV_BASE_IMAGE) \
                       --build-arg RELEASE=$(RELEASE) \
-                      --build-arg VERSION=$(ONECLIENT_VERSION) \
+                      --build-arg ONECLIENT_VERSION=$(ONECLIENT_VERSION) \
                       --build-arg FSONEDATAFS_VERSION=$(FSONEDATAFS_VERSION) \
                       --build-arg HTTP_PROXY=$(HTTP_PROXY) \
                       --build-arg ONECLIENT_PACKAGE=oneclient \
@@ -291,7 +291,7 @@ docker_dev_ones3:
                       --password $(DOCKER_REG_PASSWORD) \
                       --build-arg BASE_IMAGE=$(DOCKER_DEV_BASE_IMAGE) \
                       --build-arg RELEASE=$(RELEASE) \
-                      --build-arg VERSION=$(ONECLIENT_VERSION) \
+                      --build-arg ONECLIENT_VERSION=$(ONECLIENT_VERSION) \
                       --build-arg HTTP_PROXY=$(HTTP_PROXY) \
                       --build-arg ONES3_PACKAGE=ones3 \
                       --report docker-dev-ones3-build-report.txt \
@@ -398,3 +398,23 @@ onedatafs_jupyter_conda:
 
 codetag-tracker:
 	./bamboos/scripts/codetag-tracker.sh --branch=${BRANCH} --excluded-dirs=node_package,oneclient,fs-onedatafs
+
+#
+# Replace the release value in the convinience install script oneclient.sh and
+# upload it to packages.devel.onedata.org or packages.onedata.org
+#
+publish-script-dev:
+	sed -i "s/^RELEASE=.*/RELEASE=$(RELEASE)/" install/oneclient.sh && \
+	sed -i "s/^URL=.*/URL=http:\/\/packages.devel.onedata.org/" install/oneclient.sh && \
+	scp install/oneclient.sh docker_packages_devel:/var/www/onedata/oneclient.sh
+
+publish-script-test:
+	sed -i "s/^RELEASE=.*/RELEASE=$(RELEASE)/" install/oneclient.sh && \
+	sed -i "s/^URL=.*/URL=http:\/\/packages.devel.onedata.org/" install/oneclient.sh && \
+	scp install/oneclient.sh docker_packages_devel:/var/www/onedata/oneclient-test.sh
+
+publish-script:
+	sed -i "s/^RELEASE=.*/RELEASE=$(RELEASE)/" install/oneclient.sh && \
+	sed -i "s/^URL=.*/URL=http:\/\/packages.onedata.org/" install/oneclient.sh && \
+	scp install/oneclient.sh docker_packages:/var/www/onedata/oneclient.sh
+
