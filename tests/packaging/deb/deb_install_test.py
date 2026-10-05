@@ -12,6 +12,12 @@ file_dir = os.path.dirname(os.path.realpath(__file__))
 with open('./RELEASE', 'r') as f:
     release = f.read().replace('\n', '')
 
+# Distributions set up with the Onedata apt repository. The oneclient package
+# for jammy and noble takes all its dependencies (fuse3, ca-certificates) from
+# the Ubuntu archive, and the repository has jammy/noble dists only for
+# releases that shipped oneclient for them.
+ONEDATA_REPO_DISTS = ['xenial', 'bionic', 'focal']
+
 class Distribution(object):
 
     def __init__(self, request, link={}, privileged=False):
@@ -45,13 +51,21 @@ class Distribution(object):
 def setup_command():
     return 'echo -n \'Acquire::http::Proxy \"http://proxy.devel.onedata.org:3128\";\' > /etc/apt/apt.conf.d/proxy.conf && ' \
         'apt-get update && ' \
-        'DEBIAN_FRONTEND=noninteractive apt-get install -y ca-certificates locales {{python_pkg}} wget curl gnupg && ' \
+        'DEBIAN_FRONTEND=noninteractive apt-get install -y ca-certificates locales {python_pkg} wget curl gnupg && ' \
         '(if [ ! -f /usr/bin/python ]; then apt install -y python-is-python3; fi) && ' \
-        'wget -qO- {url}/onedata.gpg.key | apt-key add - && ' \
-        'echo "deb {url}/apt/ubuntu/{{release}} {{dist}} main" > /etc/apt/sources.list.d/onedata.list && ' \
-        'echo "deb-src {url}/apt/ubuntu/{{release}} {{dist}} main" >> /etc/apt/sources.list.d/onedata.list && ' \
-        'apt-get update && ' \
-        'locale-gen en_US.UTF-8'.format(url='http://packages.onedata.org')
+        '{onedata_repo_command}' \
+        'locale-gen en_US.UTF-8'
+
+
+def onedata_repo_command(distribution):
+    if distribution.name not in ONEDATA_REPO_DISTS:
+        return ''
+    return 'wget -qO- {url}/onedata.gpg.key | apt-key add - && ' \
+        'echo "deb {url}/apt/ubuntu/{release} {dist} main" > /etc/apt/sources.list.d/onedata.list && ' \
+        'echo "deb-src {url}/apt/ubuntu/{release} {dist} main" >> /etc/apt/sources.list.d/onedata.list && ' \
+        'apt-get update && '.format(url='http://packages.onedata.org',
+                                    release=distribution.release,
+                                    dist=distribution.name)
 
 
 @pytest.fixture(scope='module')
@@ -86,9 +100,9 @@ def oneclient(request, setup_command):
         python_pkg = 'python'
     else:
         python_pkg = 'python3'
-    command = setup_command.format(dist=distribution.name,
-                                   release=distribution.release,
-                                   python_pkg=python_pkg)
+    command = setup_command.format(
+        onedata_repo_command=onedata_repo_command(distribution),
+        python_pkg=python_pkg)
 
     assert 0 == docker.exec_(distribution.container,
                              interactive=True,
@@ -102,9 +116,9 @@ def oneclient(request, setup_command):
                 params=['focal'])
 def oneclient_base(request, setup_command):
     distribution = Distribution(request, privileged=True)
-    command = setup_command.format(dist=distribution.name,
-                                   release=distribution.release,
-                                   python_pkg='python')
+    command = setup_command.format(
+        onedata_repo_command=onedata_repo_command(distribution),
+        python_pkg='python')
 
     assert 0 == docker.exec_(distribution.container,
                              interactive=True,
@@ -126,9 +140,9 @@ def oneprovider(request, onezone, setup_command):
     # Link provider docker to the OZ node (this way we do not need DNS here).
     # This link will cause connections to 'oz.1234.test' reach 'node.oz.1234.test'
     distribution = Distribution(request, link={onezone_node: onezone_domain})
-    command = setup_command.format(dist=distribution.name,
-                                   release=distribution.release,
-                                   python_pkg='python')
+    command = setup_command.format(
+        onedata_repo_command=onedata_repo_command(distribution),
+        python_pkg='python')
     command = '{command} && ' \
         'apt-get install -y python-pip gnupg2 libssl1.0.0 && ' \
         'pip install requests'.format(command=command)
