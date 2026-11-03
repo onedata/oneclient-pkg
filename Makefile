@@ -254,7 +254,7 @@ docker_oneclient:
                       --short-report docker-build-list.json \
                       --name oneclient --publish docker -f docker/Dockerfile.oneclient
 	@# If this a release branch then create and push a '-latest' release image
-	@if ! echo "$(ONECLIENT_VERSION)" | grep -qE '\.[0-9a-z]{7}$$'; then \
+	@if ! echo "$(ONECLIENT_VERSION)" | grep -qE '\.[0-9a-z]{4,}$$'; then \
 		echo "This a release branch. Creating docker image $(DOCKER_REG_NAME)/oneclient:$(RELEASE)-latest..."; \
 		docker tag $(DOCKER_REG_NAME)/oneclient:$(ONECLIENT_VERSION) $(DOCKER_REG_NAME)/oneclient:$(RELEASE)-latest; \
 		docker push $(DOCKER_REG_NAME)/oneclient:$(RELEASE)-latest; \
@@ -277,7 +277,7 @@ docker_ones3:
                       --short-report docker-ones3-build-list.json \
                       --name ones3 --publish docker -f docker/Dockerfile.ones3
 	@# If this a release branch then create and push a '-latest' release image
-	@if ! echo "$(ONECLIENT_VERSION)" | grep -qE '\.[0-9a-z]{7}$$'; then \
+	@if ! echo "$(ONECLIENT_VERSION)" | grep -qE '\.[0-9a-z]{4,}$$'; then \
 		echo "This a release branch. Creating docker image $(DOCKER_REG_NAME)/ones3:$(RELEASE)-latest..."; \
 		docker tag $(DOCKER_REG_NAME)/ones3:$(ONECLIENT_VERSION) $(DOCKER_REG_NAME)/ones3:$(RELEASE)-latest; \
 		docker push $(DOCKER_REG_NAME)/ones3:$(RELEASE)-latest; \
@@ -300,7 +300,7 @@ docker_dev_oneclient:
                       --short-report docker-dev-build-list.json \
                       --name oneclient-dev --publish docker -f docker/Dockerfile.oneclient
 	@# If this a release branch then create and push a '-latest' release image
-	@if ! echo "$(ONECLIENT_VERSION)" | grep -qE '\.[0-9a-z]{7}$$'; then \
+	@if ! echo "$(ONECLIENT_VERSION)" | grep -qE '\.[0-9a-z]{4,}$$'; then \
 		echo "This a release branch. Creating docker image $(DOCKER_REG_NAME)/oneclient-dev:$(RELEASE)-latest..."; \
 		docker tag $(DOCKER_REG_NAME)/oneclient-dev:$(ONECLIENT_VERSION) $(DOCKER_REG_NAME)/oneclient-dev:$(RELEASE)-latest; \
 		docker push $(DOCKER_REG_NAME)/oneclient-dev:$(RELEASE)-latest; \
@@ -322,7 +322,7 @@ docker_dev_ones3:
                       --short-report docker-dev-ones3-build-list.json \
                       --name ones3-dev --publish docker -f docker/Dockerfile.ones3
 	@# If this a release branch then create and push a '-latest' release image
-	@if ! echo "$(ONECLIENT_VERSION)" | grep -qE '\.[0-9a-z]{7}$$'; then \
+	@if ! echo "$(ONECLIENT_VERSION)" | grep -qE '\.[0-9a-z]{4,}$$'; then \
 		echo "This a release branch. Creating docker image $(DOCKER_REG_NAME)/ones3-dev:$(RELEASE)-latest..."; \
 		docker tag $(DOCKER_REG_NAME)/ones3-dev:$(ONECLIENT_VERSION) $(DOCKER_REG_NAME)/ones3-dev:$(RELEASE)-latest; \
 		docker push $(DOCKER_REG_NAME)/ones3-dev:$(RELEASE)-latest; \
