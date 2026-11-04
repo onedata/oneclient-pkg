@@ -260,7 +260,8 @@ docker_oneclient:
 		docker push $(DOCKER_REG_NAME)/oneclient:$(RELEASE)-latest; \
 		docker rmi $(DOCKER_REG_NAME)/oneclient:$(RELEASE)-latest; \
 	fi 
-	@docker rmi $(DOCKER_REG_NAME)/oneclient:$(ONECLIENT_VERSION)
+	@docker rmi $(DOCKER_REG_NAME)/oneclient:$(ONECLIENT_VERSION) || true
+	@docker rmi $(DOCKER_REG_NAME)/oneclient:develop || true
 
 .PHONY: docker_ones3
 docker_ones3:
@@ -283,7 +284,8 @@ docker_ones3:
 		docker push $(DOCKER_REG_NAME)/ones3:$(RELEASE)-latest; \
 		docker rmi $(DOCKER_REG_NAME)/ones3:$(RELEASE)-latest; \
 	fi 
-	@docker rmi $(DOCKER_REG_NAME)/ones3:$(ONECLIENT_VERSION)
+	@docker rmi $(DOCKER_REG_NAME)/ones3:$(ONECLIENT_VERSION) || true
+	@docker rmi $(DOCKER_REG_NAME)/ones3:develop || true
 
 .PHONY: docker_dev_oneclient
 docker_dev_oneclient:
@@ -306,7 +308,8 @@ docker_dev_oneclient:
 		docker push $(DOCKER_REG_NAME)/oneclient-dev:$(RELEASE)-latest; \
 		docker rmi $(DOCKER_REG_NAME)/oneclient-dev:$(RELEASE)-latest; \
 	fi 
-	@docker rmi $(DOCKER_REG_NAME)/oneclient-dev:$(ONECLIENT_VERSION)
+	@docker rmi $(DOCKER_REG_NAME)/oneclient-dev:$(ONECLIENT_VERSION) || true
+	@docker rmi $(DOCKER_REG_NAME)/oneclient-dev:develop || true
 
 .PHONY: docker_dev_ones3
 docker_dev_ones3:
@@ -328,7 +331,8 @@ docker_dev_ones3:
 		docker push $(DOCKER_REG_NAME)/ones3-dev:$(RELEASE)-latest; \
 		docker rmi $(DOCKER_REG_NAME)/ones3-dev:$(RELEASE)-latest; \
 	fi 
-	@docker rmi $(DOCKER_REG_NAME)/ones3-dev:$(ONECLIENT_VERSION)
+	@docker rmi $(DOCKER_REG_NAME)/ones3-dev:$(ONECLIENT_VERSION) || true
+	@docker rmi $(DOCKER_REG_NAME)/ones3-dev:develop || true
 
 #
 # Build all oneclient and ones3 dockers
